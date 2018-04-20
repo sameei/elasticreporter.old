@@ -1,2 +1,12 @@
 *.class
 *.log
+.idea/
+target
+project/target
+
+module/xjava/project/target
+module/xjava/target
+module/base/project/target
+module/base/target
+module/flink14/project/target
+module/flink14/target
