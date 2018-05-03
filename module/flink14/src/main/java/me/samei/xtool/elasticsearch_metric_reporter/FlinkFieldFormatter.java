@@ -1,6 +1,9 @@
 package me.samei.xtool.elasticsearch_metric_reporter;
 
 import org.apache.flink.metrics.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.ArrayList;
 
@@ -8,7 +11,13 @@ import java.util.ArrayList;
 public class FlinkFieldFormatter
         extends me.samei.xtool.elasticsearch_metric_reporter.AbstractFieldFormatter {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
+
     public <T> String format(String key, Gauge<T> gauge) {
+
+        logger.warn("GAUGE: " + key);
+
         String formattedValue = null;
         T value = gauge.getValue();
 
@@ -20,11 +29,16 @@ public class FlinkFieldFormatter
     }
 
     public String format(String key, Counter counter) {
+
+        logger.warn("COUNTER: " + key);
+
         return apply(key, Long.toString(counter.getCount()));
     }
 
 
     public Collection<String> format(String key, Histogram histogram) {
+
+        logger.warn("HISTOGRAM: " + key);
 
         ArrayList<String> list = new java.util.ArrayList<>(8);
         HistogramStatistics stats = histogram.getStatistics();
@@ -43,6 +57,8 @@ public class FlinkFieldFormatter
     }
 
     public Collection<String> format(String key, Meter meter) {
+
+        logger.warn("METER: " + key);
 
         ArrayList<String> list = new java.util.ArrayList<>(2);
         String formattedKey = formatKey(key);

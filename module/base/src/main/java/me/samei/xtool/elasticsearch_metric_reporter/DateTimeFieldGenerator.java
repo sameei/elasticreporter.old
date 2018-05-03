@@ -17,8 +17,12 @@ public interface DateTimeFieldGenerator {
         private final DateTimeFormatter datetimeFormattter =
                 DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.of("UTC"));
 
+
+
         @Override
         public Collection<String> generate(long millis, FieldFormatter formatter) {
+
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
             ArrayList<String> list = new ArrayList<>(2);
 

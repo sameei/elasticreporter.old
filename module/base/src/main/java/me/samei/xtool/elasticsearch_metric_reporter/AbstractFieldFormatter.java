@@ -2,7 +2,7 @@ package me.samei.xtool.elasticsearch_metric_reporter;
 
 public abstract class AbstractFieldFormatter implements FieldFormatter {
 
-    String keyEscapeRegex = "[\\\\|/.\"']";
+    String keyEscapeRegex = "[\\\\|/\"']";
     String valueEscapeRegex = "[\"\\n\\r]";
 
     String formatKey(String key) {
@@ -14,6 +14,7 @@ public abstract class AbstractFieldFormatter implements FieldFormatter {
     }
 
     String apply(String rawKey, String formattedValue) {
+
         return new StringBuilder()
                 .append(" \"")
                 .append(formatKey(rawKey))
@@ -23,6 +24,7 @@ public abstract class AbstractFieldFormatter implements FieldFormatter {
     }
 
     String apply(String formattedKey, String keyPostfix, String formattedValue) {
+
         return new StringBuilder()
                 .append(" \"")
                 .append(formattedKey)
