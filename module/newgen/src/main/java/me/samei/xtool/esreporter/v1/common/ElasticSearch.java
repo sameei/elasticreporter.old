@@ -10,6 +10,9 @@ import java.net.URL;
 
 public class ElasticSearch {
 
+
+    public static String indexDocument = "doc";
+
     private final String host;
     private final Logger logger;
 
@@ -25,11 +28,11 @@ public class ElasticSearch {
         this.host = host;
     }
 
-    public void put(String index, long time, String json) throws IOException {
+    public boolean put(Report report) throws IOException {
 
-        String url = genURL(index, time);
+        String url = genURL(report.index, report.time);
 
-        if (logger.isTraceEnabled()) logger.trace("PUT, Index: {}, Time: {}, GeneratedURL: {}", index, time, url);
+        if (logger.isTraceEnabled()) logger.trace("PUT, Index: {}, Time: {}, GeneratedURL: {}", report.index, report.time, url);
 
         HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
 
@@ -39,9 +42,9 @@ public class ElasticSearch {
         http.setRequestProperty("Content-Type", "application/json");
 
         OutputStream output = new DataOutputStream(http.getOutputStream());
-        byte[] bytes = json.getBytes();
+        byte[] bytes = report.body.getBytes();
 
-        if (logger.isTraceEnabled()) logger.trace("PUT, RequestBodyLen: {}, RequestBody: {}", bytes.length, json);
+        if (logger.isTraceEnabled()) logger.trace("PUT, RequestBodyLen: {}, RequestBody: {}", bytes.length, report.body);
 
         output.write(bytes);
 
@@ -72,20 +75,22 @@ public class ElasticSearch {
         if (successful) {
             if (logger.isDebugEnabled()) logger.debug(
                     "PUT, Index: {}, Time: {}, URL: {}, RequestBodyLen: {}, Response({}): {}, ResponseBodyLen: {}",
-                    index, time, url,
+                    report.index, report.time, url,
                     bytes.length,
                     http.getResponseCode(), http.getResponseMessage(),
                     body.getBytes().length
             );
+            return true;
         } else {
             if (logger.isWarnEnabled()) logger.warn(
-                    "PUT, Index: {}, Time: {}, URL: {}, RequestBodyLen: {}, Response({}): {}, ResponseBodyLen: {}, ResponseBody: {}",
-                    index, time, url,
+                    "PUT, Index: {}, Time: {}, URL: {}, RequestBodyLen: {}, Response({}): {}, ResponseBodyLen: {}, ResponseBody: {}, Request: {}",
+                    report.index, report.time, url,
                     bytes.length,
                     http.getResponseCode(), http.getResponseMessage(),
                     body.getBytes().length,
-                    body
+                    body, report.body
             );
+            return false;
         }
     }
 
@@ -93,8 +98,8 @@ public class ElasticSearch {
         return new StringBuilder()
                 .append(this.host)
                 .append("/")
-                .append(index)
-                .append("/doc/")
+                .append(index).append("/")
+                .append(indexDocument).append("/")
                 .append(Long.toString(time))
                 .toString();
     }

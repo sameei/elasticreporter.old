@@ -1,8 +1,6 @@
 package me.samei.xtool.esreporter.v1.common;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface Formatter {
@@ -19,16 +17,16 @@ public interface Formatter {
 
         protected String keysInvalidRegex = "[\\\\|/\"'\\n\\r]";
         protected Pattern keysInvalidPattern = Pattern.compile(keysInvalidRegex);
-        public boolean isValidKey(String key) { return keysInvalidPattern.matcher(key).find(); }
+        public boolean isInvalid(String key) { return keysInvalidPattern.matcher(key).find(); }
         public void checkKeyValidity(String key) {
-            if (!isValidKey(key)) throw new RuntimeException("Invlaid Key: '"+ key + "'");
+            if (isInvalid(key)) throw new RuntimeException("Invlaid Key: '"+ key + "'");
         }
 
         protected String valuesInvalidRegex = "[\"\\n\\r]";
         protected Pattern valuesInvalidPattern = Pattern.compile(valuesInvalidRegex);
-        public boolean isValidStringValue(String value) { return valuesInvalidPattern.matcher(value).find(); }
+        public boolean isInvalidStringValue(String value) { return valuesInvalidPattern.matcher(value).find(); }
         public void checkStringValueValidity(String value) {
-            if (!isValidStringValue(value)) throw new RuntimeException("Invlaid Value: '"+ value + "'");
+            if (isInvalidStringValue(value)) throw new RuntimeException("Invlaid Value: '"+ value + "'");
         }
 
         @Override

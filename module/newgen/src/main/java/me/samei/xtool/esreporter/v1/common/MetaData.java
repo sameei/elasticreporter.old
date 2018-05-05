@@ -1,7 +1,5 @@
 package me.samei.xtool.esreporter.v1.common;
 
-import com.sun.istack.internal.NotNull;
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -16,13 +14,7 @@ public class MetaData {
     public static String defaultSourceIdKey = "source.id";
     public static String defaultIndexKey = "index.name";
 
-    public static DateTimeFormatter datetime(String pattern, String zone) {
-        return DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.of(zone));
-    }
 
-    public static DateTimeFormatter simpleUTC() {
-        return datetime("yyyy-MM-dd HH:mm:ss", "UTC");
-    }
 
     public final String prefix;
     public final String timeMillisKey;
@@ -30,6 +22,28 @@ public class MetaData {
     public final String sourceIdKey;
     public final String indexNameKey;
     public final DateTimeFormatter datetimeFormatter;
+
+    public static MetaData defaultInstance() {
+        return new MetaData(
+                defualtMetaFieldPrefix,
+                defaultTimeMillisKey,
+                defaultDateTimeKey,
+                defaultSourceIdKey,
+                defaultIndexKey,
+                me.samei.xjava.util.DateTime.formatterOfSimpleUTC()
+        );
+    }
+
+    public static MetaData defaultInstance(String pattern, String zoneId) {
+        return new MetaData(
+                defualtMetaFieldPrefix,
+                defaultTimeMillisKey,
+                defaultDateTimeKey,
+                defaultSourceIdKey,
+                defaultIndexKey,
+                DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.of(zoneId))
+        );
+    }
 
     public MetaData(
             String prefix,
@@ -58,6 +72,7 @@ public class MetaData {
                 .append("', datetimeKey: '").append(datetimeKey)
                 .append("', sourceIdKey: '").append(sourceIdKey)
                 .append("', indexNameKey: '").append(indexNameKey)
+                .append("', datetimeFormatter: '").append(datetimeFormatter)
                 .append("')")
                 .toString();
     }

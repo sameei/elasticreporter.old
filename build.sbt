@@ -53,6 +53,8 @@ lazy val newgen = define(
   "newgen"
 ).settings(
   libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided
-)
+).dependsOn(xjava)
+
+lazy val newgenflink14 = flink("ngflink", "1.4.2").dependsOn(newgen)
 
 // ============================================================

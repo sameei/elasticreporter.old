@@ -1,73 +1,90 @@
 package me.samei.xtool.esreporter.v1.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Collection;
 
-public class Reporter {
+public class Reporter implements Formatter {
 
-    static public String metaFieldsPrefix = "@meta";
+    public final ElasticSearch es;
+    public final Generator reporter;
+    public final Formatter formatter;
 
-
-    static public String metaIndexNameKey = metaFieldsPrefix + ".index.name";
-    static public String metaIndexTimeMillisKey = metaFieldsPrefix + ".time.millis";
-    static public String metaIndexDateTimeKey = metaFieldsPrefix + ".time.format";
-    static public String metaSourceIdKey = metaFieldsPrefix + ".source.id";
-
-    protected final ElasticSearch es;
-    protected final IndexName index;
-    protected final MetaData metadata;
+    protected final Logger logger;
 
     public Reporter(
             ElasticSearch es,
-            IndexName index,
-            MetaData metadata,
-            boolean debug
+            Generator reporter,
+            Formatter formatter
     ) {
         this.es = es;
-        this.index = index;
-        this.metadata = metadata;
+        this.reporter = reporter;
+        this.formatter = formatter;
+        this.logger = LoggerFactory.getLogger(getClass());
     }
 
-    public String generate(long time, Collection<Value> values, Formatter formatter) throws IOException {
+    public void report(long time, Collection<Value> values) throws IOException {
 
-        String indexName = index.generate(time);
+        if (logger.isTraceEnabled()) logger.trace("Report, Time: {}, Values({}) ...", time, values.size());
 
-        values.addAll(metadata.generate(time, indexName, "", formatter));
+        Report report = reporter.generate(time, values, formatter);
 
+        if (logger.isTraceEnabled()) logger.trace(
+                "Report, Time: {}, Index: {}, Body({}) ...",
+                report.time, report.index, report.body.length()
+        );
 
+        boolean successful = es.put(report);
 
-        StringBuilder buf = new StringBuilder();
-
-        buf.append("{ ");
-        appendMeta(time, indexName, formatter, buf);
-
-        for (Value value: values) {
-            buf.append(", \"").append(value.key).append("\": ");
-            switch (value.type) {
-                case Simple: buf.append(value.value);
-                case Quoted: buf.append('"').append(value).append('"');
-            }
+        if (successful) {
+            if (logger.isDebugEnabled()) logger.debug("Report, Time: {}, Index: {}", report.time, report.index);
+        } else if (logger.isWarnEnabled()) {
+            logger.warn("Report, Time: {}, Index: {}, Failed!", report.time, report.index);
         }
-
-        buf.append("}");
-
-        return buf.toString();
     }
 
-    protected void appendMeta(long time, String indexName, Formatter formatter, StringBuilder buf) {
-
-        Value a = formatter.formatString(metaIndexNameKey, indexName);
-        Value b = formatter.formatNum(metaIndexTimeMillisKey, time);
-
-        buf.append('"')
-                .append(a.key)
-                .append("\": \"")
-                .append(a.value)
-                .append("\", \"")
-                .append(b.key)
-                .append("\": ")
-                .append(b.value)
-        ;
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("(es: ").append(es)
+                .append(", reporter: ").append(reporter)
+                .append(", formatter: ").append(formatter)
+                .append(")").toString();
     }
 
+    static public Reporter build(
+            String sourceId,
+            String url,
+            String indexPattern,
+            String datetimePattern,
+            String zoneId
+    ) throws IOException {
+        return new Reporter(
+                new ElasticSearch(url),
+                new Generator(
+                        sourceId,
+                        new IndexName(indexPattern, zoneId),
+                        MetaData.defaultInstance(datetimePattern, zoneId)
+                        ),
+                new Formatter.Default()
+        );
+    }
+
+    @Override
+    public String formatKey(String key) {
+        return formatter.formatKey(key);
+    }
+
+    @Override
+    public Value formatString(String rawKey, String rawValue) {
+        return formatter.formatString(rawKey, rawValue);
+    }
+
+    @Override
+    public Value formatNum(String rawKey, Number rawValue) {
+        return formatter.formatNum(rawKey, rawValue);
+    }
 }
