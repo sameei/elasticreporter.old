@@ -1,4 +1,4 @@
-package me.samei.xtool.elasticsearch_metric_reporter;
+package me.samei.xtool.esreporter.v1.flink;
 
 import org.apache.flink.metrics.Metric;
 import org.apache.flink.metrics.MetricConfig;
@@ -10,12 +10,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class Debbuger implements MetricReporter, Scheduled {
+public class Debugger implements MetricReporter, Scheduled {
 
     Logger logger = null;
 
+
     @Override
     public void open(MetricConfig config) {
+
         String name = config.getString("logger-name", null);
 
         if (name == null) throw new IllegalArgumentException("'logger-name' is mandatory!");
