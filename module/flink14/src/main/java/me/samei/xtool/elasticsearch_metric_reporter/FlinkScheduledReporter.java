@@ -7,8 +7,6 @@ import org.apache.flink.metrics.reporter.MetricReporter;
 import org.apache.flink.metrics.reporter.Scheduled;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.apache.flink.configuration.MetricOptions;
-import org.apache.flink.runtime.metrics.scope.*;
 
 import java.net.InetAddress;
 import java.util.Collection;
