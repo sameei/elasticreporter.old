@@ -37,6 +37,10 @@ metrics.reporter.eslog-dirty.datetime-zone: UTC
 metric.reporter.debug.class: me.samei.xtool.esreporter.v1.flink.Slf4jDebugger
 metric.reporter.debug.logger-name: MetricDebugger
 ```
+```
+metrics.reporter.name.index-pattern: <source-id>-<year>-<month>-<day-of-month>
+```
+
 
 ```
 metric.reporter.debug.class: me.samei.xtool.elasticsearch_metric_reporter.Debugger
