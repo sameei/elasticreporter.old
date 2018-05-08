@@ -2,7 +2,7 @@
 // ============================================================
 
 lazy val common = Seq(
-  scalaVersion := "2.12.5",
+  scalaVersion := "2.11.12",
   libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % Test,
   libraryDependencies ++= Seq(
     "circe-core", "circe-generic", "circe-parser"

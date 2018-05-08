@@ -66,7 +66,7 @@ public class Reporter implements Formatter {
                 new ElasticSearch(url),
                 new Generator(
                         sourceId,
-                        new IndexName(indexPattern, zoneId),
+                        new IndexName(indexPattern, zoneId, sourceId),
                         MetaData.defaultInstance(datetimePattern, zoneId)
                         ),
                 new Formatter.Default()

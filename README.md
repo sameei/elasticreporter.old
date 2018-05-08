@@ -27,9 +27,15 @@ metrics.reporter.eslog-dirty.index-pattern: stage-flink-dirty-jba1-<year>-<month
 metrics.reporter.eslog-dirty.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.eslog-dirty.datetime-zone: UTC
 
+metrics.reporter.eslog-dirty.class: me.samei.xtool.esreporter.v1.flink.Debugger
+metrics.reporter.eslog-dirty.source-id: jobmanager-a1
+metrics.reporter.eslog-dirty.es-url: http://localhost:9200
+metrics.reporter.eslog-dirty.index-pattern: single-index
+metrics.reporter.eslog-dirty.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.eslog-dirty.datetime-zone: UTC
+
 metric.reporter.debug.class: me.samei.xtool.esreporter.v1.flink.Slf4jDebugger
 metric.reporter.debug.logger-name: MetricDebugger
-
 ```
 
 ```
