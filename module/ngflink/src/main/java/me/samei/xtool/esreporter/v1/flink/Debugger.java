@@ -26,6 +26,7 @@ public class Debugger extends ReporterInitializer implements Scheduled {
         values.add(fromString("subject", subject));
         values.add(fromString("class", metric.getClass().getName()));
         values.add(fromString("name", name));
+        values.add(fromString("id", group.getMetricIdentifier(name)));
 
         int i = 1;
         for(String item: group.getScopeComponents()) {

@@ -37,8 +37,13 @@ metrics.reporter.eslog-dirty.datetime-zone: UTC
 metric.reporter.debug.class: me.samei.xtool.esreporter.v1.flink.Slf4jDebugger
 metric.reporter.debug.logger-name: MetricDebugger
 ```
+
 ```
-metrics.reporter.name.index-pattern: <source-id>-<year>-<month>-<day-of-month>
+conf-path.source-id: SOURCE_ID
+conf-path.es-url: http://localhost:9200
+conf-path.index-pattern: <source-id>-<year>-<month>-<day-of-month>
+conf-path.datetime-pattern: yyyy-MM-dd HH:mm:ss
+conf-path.datetime-zone: UTC
 ```
 
 
