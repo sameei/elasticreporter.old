@@ -9,6 +9,7 @@ import java.util.Collection;
 public class MetaData {
 
     public static String defualtMetaFieldPrefix = "@meta";
+    public static String defaultMetaFieldPrefix = defualtMetaFieldPrefix;
     public static String defaultTimeMillisKey = "time.millis";
     public static String defaultDateTimeKey = "time.format";
     public static String defaultSourceIdKey = "source.id";

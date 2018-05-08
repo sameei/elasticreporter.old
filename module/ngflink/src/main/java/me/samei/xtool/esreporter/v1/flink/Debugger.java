@@ -33,14 +33,15 @@ public class Debugger implements Scheduled, MetricReporter {
         String host = config.getString("es-url", null);
         if (host == null) throw new IllegalArgumentException("'es-url' is mandatory!");
 
-        String indexPath = config.getString("es-url", null);
+        String indexPath = config.getString("index", null);
         if (indexPath == null) throw new IllegalArgumentException("'index' is mandatory!");
 
         try {
             elastic = new ElasticSearch(host);
         } catch (Exception cause) {
-            logger.error("InitError: " + cause.getMessage(), cause);
-            throw new RuntimeException("InitError", cause);
+            String message = "InitError: " + cause.getMessage();
+            logger.error(message, cause);
+            throw new RuntimeException(message, cause);
         }
     }
 

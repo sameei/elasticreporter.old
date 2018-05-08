@@ -2,8 +2,11 @@
 // ============================================================
 
 lazy val common = Seq(
-  scalaVersion := "2.11.11",
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % Test
+  scalaVersion := "2.12.5",
+  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % Test,
+  libraryDependencies ++= Seq(
+    "circe-core", "circe-generic", "circe-parser"
+  ).map { m => "io.circe" %% m % "0.9.3" % Test }
 )
 
 def define(moduleName: String, artifact: String, dirName: String) = {
