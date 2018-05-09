@@ -57,9 +57,13 @@ public interface Select {
 
     public static class AcceptAll implements Select {
 
+        private final Logger logger = LoggerFactory.getLogger(getClass());
+
         @Override
         public String apply(Metric metric, String name, MetricGroup group) {
-            return group.getMetricIdentifier(name);
+            String id = group.getMetricIdentifier(name);
+            if (logger.isTraceEnabled()) logger.trace("{}, Matched, ID: {}", name, id);
+            return id;
         }
 
         @Override
@@ -89,7 +93,11 @@ public interface Select {
         @Override
         public String apply(Metric metric, String name, MetricGroup group) {
             for (Map.Entry<String, String> var: group.getAllVariables().entrySet()) {
-                if (check(name)) return group.getMetricIdentifier(name);
+                if (check(name)) {
+                    String id = group.getMetricIdentifier(name);
+                    if (logger.isTraceEnabled()) logger.trace("{}, Matched, ID: {}", name, id);
+                    return id;
+                }
             }
             return null;
         }
