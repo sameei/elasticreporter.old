@@ -1,5 +1,6 @@
 package me.samei.xtool.esreporter.v1.flink;
 
+import me.samei.xtool.esreporter.v1.common.MetaData;
 import me.samei.xtool.esreporter.v1.common.Value;
 import org.apache.flink.metrics.*;
 import org.slf4j.Logger;
@@ -132,12 +133,14 @@ public class GroupedMetrics {
         return result.values();
     }
 
-    protected Map<String, String> variables () {
-        Map<String, String> temp = new HashMap<>();
-        for(Map.Entry<String, String> item : vars.entrySet()) {
-            temp.put(item.getKey(), item.getValue());
+    protected Collection<Value> collectVars(MetaData meta) {
+        ArrayList<Value> list = new ArrayList<>();
+        for (Map.Entry<String, String> item: vars.entrySet()) {
+            String key = meta.keyWith("var" + "." + item.getKey());
+            Value value = formatter.fromString(key, item.getValue());
+            list.add(value);
         }
-        return temp;
+        return list;
     }
 
 
