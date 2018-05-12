@@ -9,6 +9,11 @@ public class JobsReporter extends AbstractReporter {
             "numRunningJobs",
     };
 
+    private GroupedMetrics _metrics = new GroupedMetrics();
+
+    @Override
+    public GroupedMetrics metrics() { return _metrics; }
+
     @Override
     protected String name() { return "Jobs"; }
 

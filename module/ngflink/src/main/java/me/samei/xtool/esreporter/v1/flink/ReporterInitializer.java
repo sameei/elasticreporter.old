@@ -4,8 +4,15 @@ import me.samei.xtool.esreporter.v1.common.Reporter;
 import me.samei.xtool.esreporter.v1.common.Value;
 import org.apache.flink.metrics.MetricConfig;
 import org.apache.flink.metrics.reporter.MetricReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Collection;
 
 public abstract class ReporterInitializer implements MetricReporter {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Reporter underlay;
 
@@ -37,14 +44,6 @@ public abstract class ReporterInitializer implements MetricReporter {
     @Override
     public void close() {
 
-    }
-
-    protected Value fromString(String key, String value) {
-        return underlay.formatter.formatString(key, value);
-    }
-
-    protected Value fromNumber(String key, Number value) {
-        return underlay.formatter.formatNum(key, value);
     }
 
 }

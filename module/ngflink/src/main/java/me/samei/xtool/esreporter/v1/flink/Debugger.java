@@ -68,4 +68,8 @@ public class Debugger extends ReporterInitializer implements Scheduled {
     public void report() {
 
     }
+
+    public Value fromString(String rawKey, String rawVal) { return underlay.formatter.formatString(rawKey, rawVal); }
+
+    public Value fromNumber(String rawKey, Number rawVal) { return underlay.formatter.formatNum(rawKey, rawVal); }
 }

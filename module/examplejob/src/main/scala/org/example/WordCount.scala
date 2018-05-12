@@ -45,6 +45,8 @@ object WordCount {
         // set up the execution environment
         val env = ExecutionEnvironment.getExecutionEnvironment
 
+        env.getConfig.setParallelism(3);
+
 
         // get input data
         val text = env.fromElements("To be, or not to be,--that is the question:--",

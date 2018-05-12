@@ -5,7 +5,7 @@ flink-conf.yaml
 ```
 metrics.reporters: eslog-jvm, eslog-jobs, eslog-dirty, debug
 
-metrics.reporter.eslog-jvm.class: me.samei.xtool.esreporter.v1.flink.JVMReporter
+metrics.reporter.eslog-jvm.class: me.samei.xtool.esreporter.v1.flink.JVMStatReporter
 metrics.reporter.eslog-jvm.source-id: jobmanager-a1
 metrics.reporter.eslog-jvm.es-url: http://localhost:9200
 metrics.reporter.eslog-jvm.index-pattern: stage-flink-jvm-t1-jba1-<year>-<month>-<day-of-month>

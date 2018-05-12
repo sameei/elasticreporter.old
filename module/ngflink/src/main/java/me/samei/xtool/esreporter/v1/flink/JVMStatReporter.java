@@ -1,6 +1,9 @@
 package me.samei.xtool.esreporter.v1.flink;
 
-public class JVMReporter extends AbstractReporter {
+import org.apache.flink.metrics.Metric;
+import org.apache.flink.metrics.MetricGroup;
+
+public class JVMStatReporter extends AbstractReporter {
 
     private static String[] _tokens = {
             "Status.JVM.ClassLoader.ClassesLoaded",
@@ -25,6 +28,11 @@ public class JVMReporter extends AbstractReporter {
             "Status.JVM.CPU.Load",
             "Status.JVM.CPU.Time",
     };
+
+    private GroupedMetrics _metrics = new GroupedMetrics();
+
+    @Override
+    public GroupedMetrics metrics() { return _metrics; }
 
     @Override
     protected String name() { return "JVM"; }

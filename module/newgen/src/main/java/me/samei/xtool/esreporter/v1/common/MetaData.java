@@ -56,12 +56,14 @@ public class MetaData {
     ) {
 
         this.prefix = prefix;
-        this.timeMillisKey = prefix + "." + timeMillisKey;
-        this.datetimeKey = prefix + "." + datetimeKey;
-        this.sourceIdKey = prefix + "." + sourceIdKey;
-        this.indexNameKey = prefix + "." + indexNameKey;
+        this.timeMillisKey = keyWith(timeMillisKey);
+        this.datetimeKey = keyWith(datetimeKey);
+        this.sourceIdKey = keyWith(sourceIdKey);
+        this.indexNameKey = keyWith(indexNameKey);
         this.datetimeFormatter = datetimeFormatter;
     }
+
+    public String keyWith(String postfix) { return prefix + "." + postfix; }
 
     @Override
     public String toString() {

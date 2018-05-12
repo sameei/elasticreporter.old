@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Generator {
 
@@ -16,6 +13,7 @@ public class Generator {
     protected final IndexName index;
     protected final MetaData metadata;
     protected final String sourceId;
+    protected final Map<String, String> staticVars = new HashMap<>();
 
     public Generator(
             String sourceId,
@@ -25,11 +23,12 @@ public class Generator {
         this.sourceId = sourceId;
         this.index = index;
         this.metadata = metadata;
+        staticVars.put("source_id", sourceId);
     }
 
     public Report generate(long time, Collection<Value> values, Formatter formatter) {
 
-        String indexName = index.generate(time);
+        String indexName = index.generate(time, staticVars);
 
         ArrayList<Value> all = new ArrayList<>(values);
 
