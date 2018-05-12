@@ -127,4 +127,23 @@ public interface Select {
 
     }
 
+    public static class JobTask implements Select {
+
+        public static final String JobTaskName = "<task_name>";
+        public static final String JobName = "<job_name>";
+        public static final String SubTask = "<subtask_index>";
+
+        @Override
+        public String apply(Metric metric, String name, MetricGroup group) {
+
+            Map<String, String> vars = group.getAllVariables();
+            String value = vars.getOrDefault(JobTaskName, null);
+
+            if (value == null) return null;
+
+            return vars.get(JobName) + "." + value + "." + vars.get(SubTask);
+        }
+
+    }
+
 }
