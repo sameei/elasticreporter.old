@@ -1,6 +1,7 @@
-package me.samei.xtool.esreporter.v1.flink;
+package me.samei.xtool.esreporter.v1.flink.reporter;
 
 import me.samei.xtool.esreporter.v1.common.*;
+import me.samei.xtool.esreporter.v1.flink.reporter.InitAbstract;
 import org.apache.flink.metrics.Metric;
 import org.apache.flink.metrics.MetricGroup;
 import org.slf4j.Logger;
@@ -12,13 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Debugger extends ReporterInitializer implements Scheduled {
-
-    private Logger logger;
-
-    private ElasticSearch elastic;
-
-    private String index;
+public class Debugger extends InitAbstract implements Scheduled {
 
     private HashMap<String, String> empty = new HashMap<String, String>();
 
@@ -29,7 +24,7 @@ public class Debugger extends ReporterInitializer implements Scheduled {
         values.add(fromString("subject", subject));
         values.add(fromString("class", metric.getClass().getName()));
         values.add(fromString("name", name));
-        values.add(fromString("id", group.getMetricIdentifier(name)));
+        values.add(fromString("identity", group.getMetricIdentifier(name)));
 
         int i = 1;
         for(String item: group.getScopeComponents()) {
@@ -50,7 +45,7 @@ public class Debugger extends ReporterInitializer implements Scheduled {
         try {
             long now = System.currentTimeMillis();
             Collection<Value> values = collect("AddMetric", now, metric, metricName, group);
-            underlay.report(now, values, empty);
+            report("AddMetric", now, values, empty);
         } catch (Exception cause) {
             logger.error("ReportFailure: " + cause.getMessage(), cause);
         }
@@ -61,18 +56,16 @@ public class Debugger extends ReporterInitializer implements Scheduled {
         try {
             long now = System.currentTimeMillis();
             Collection<Value> values = collect("DeleteMetric", now, metric, metricName, group);
-            underlay.report(now, values, empty);
+            report("DeleteMetric", now, values, empty);
         } catch (Exception cause) {
             logger.error("ReportFailure: " + cause.getMessage(), cause);
         }
     }
 
     @Override
-    public void report() {
+    public void report() {}
 
-    }
+    public Value fromString(String rawKey, String rawVal) { return formatter.formatString(rawKey, rawVal); }
 
-    public Value fromString(String rawKey, String rawVal) { return underlay.formatter.formatString(rawKey, rawVal); }
-
-    public Value fromNumber(String rawKey, Number rawVal) { return underlay.formatter.formatNum(rawKey, rawVal); }
+    public Value fromNumber(String rawKey, Number rawVal) { return formatter.formatNum(rawKey, rawVal); }
 }

@@ -2,13 +2,15 @@ package me.samei.xtool.esreporter.v1.common;
 
 public class Report {
 
-    public final String index;
-    public final String body;
     public final long time;
+    public final String index;
+    public final String id;
+    public final String body;
 
-    public Report(long time, String index, String body) {
+    public Report(long time, String index, String id, String body) {
         this.time = time;
         this.index = index;
+        this.id = id;
         this.body = body;
     }
 
@@ -17,8 +19,9 @@ public class Report {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("( time: ").append(time)
-                .append(", index: '").append(index)
-                .append("', body: '").append(body)
+                .append(", index: ").append(index)
+                .append(", id: ").append(id)
+                .append(", body: '").append(body)
                 .append("')").toString();
     }
 }

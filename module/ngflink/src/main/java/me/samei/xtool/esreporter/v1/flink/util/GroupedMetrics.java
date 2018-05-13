@@ -1,4 +1,4 @@
-package me.samei.xtool.esreporter.v1.flink;
+package me.samei.xtool.esreporter.v1.flink.util;
 
 import me.samei.xtool.esreporter.v1.common.MetaData;
 import me.samei.xtool.esreporter.v1.common.Value;
@@ -27,8 +27,6 @@ public class GroupedMetrics {
     }
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-    protected Formatter formatter = new Formatter();
 
     protected final Map<Gauge<?>, Container> gauges = new HashMap<>();
     protected final Map<Counter, Container> counters = new HashMap<>();
@@ -75,12 +73,16 @@ public class GroupedMetrics {
         Container cntr = new Container(key, name, metric, group);
         if (metric instanceof Counter) {
             counters.put((Counter) metric, cntr);
+            addVars(group);
         } else if (metric instanceof Gauge) {
             gauges.put((Gauge<?>) metric, cntr);
+            addVars(group);
         } else if (metric instanceof Histogram) {
             histograms.put((Histogram) metric, cntr);
+            addVars(group);
         } else if (metric instanceof Meter) {
             meters.put((Meter) metric, cntr);
+            addVars(group);
         } else {
             logger.warn("Add, Unknown Metric Type: {}, Key: {}", metric.getClass().getName(), key);
             countMetrics -= 1;
@@ -91,12 +93,16 @@ public class GroupedMetrics {
     public void remove(String key, Metric metric, String name, MetricGroup group) {
         if (metric instanceof Counter) {
             counters.remove((Counter) metric);
+            removeVars(group);
         } else if (metric instanceof Gauge) {
             gauges.remove((Gauge) metric);
+            removeVars(group);
         } else if (metric instanceof Histogram) {
             histograms.remove((Histogram) metric);
+            removeVars(group);
         } else if (metric instanceof Meter) {
             meters.remove((Meter) metric);
+            removeVars(group);
         } else {
             logger.warn("Remove, Unknown Metric Type: {}, Key: {}", metric.getClass().getName(), key);
             countMetrics += 1;
@@ -104,7 +110,7 @@ public class GroupedMetrics {
         countMetrics -= 1;
     }
 
-    protected Collection<Value> collect() {
+    public Collection<Value> collect(Formatter formatter) {
 
         ArrayList<Value> temp = new ArrayList<>();
 
@@ -143,7 +149,7 @@ public class GroupedMetrics {
 
     /*protected Collection<Value> collectVars(MetaData meta) {
         ArrayList<Value> list = new ArrayList<>();
-        for (Map.Entry<String, String> item: vars.entrySet()) {
+        for (Map.Entry<String, String> item: keys.entrySet()) {
             String key = meta.keyWith("var" + "." + item.getKey());
             Value value = formatter.fromString(key, item.getValue());
             list.add(value);

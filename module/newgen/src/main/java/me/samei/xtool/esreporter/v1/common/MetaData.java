@@ -82,7 +82,7 @@ public class MetaData {
     }
 
 
-    /*public final String pattern;
+    /*public final String indexPattern;
     public final DateTimeFormatter dateTimeFormatter;*/
 
 

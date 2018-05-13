@@ -1,4 +1,4 @@
-package me.samei.xtool.esreporter.v1.flink;
+package me.samei.xtool.esreporter.v1.flink.util;
 
 import me.samei.xtool.esreporter.v1.common.Value;
 import org.apache.flink.metrics.*;

@@ -1,7 +1,8 @@
-package me.samei.xtool.esreporter.v1.flink;
+/*
+package me.samei.xtool.esreporter.v1.flink.reporter;
 
-import org.apache.flink.metrics.Metric;
-import org.apache.flink.metrics.MetricGroup;
+import me.samei.xtool.esreporter.v1.flink.util.GroupedMetrics;
+import me.samei.xtool.esreporter.v1.flink.util.Select;
 
 public class JVMStatReporter extends AbstractReporter {
 
@@ -44,3 +45,4 @@ public class JVMStatReporter extends AbstractReporter {
     protected Select select() { return _select; }
 
 }
+*/

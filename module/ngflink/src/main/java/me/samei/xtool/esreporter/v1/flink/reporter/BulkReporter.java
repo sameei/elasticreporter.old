@@ -1,4 +1,8 @@
-package me.samei.xtool.esreporter.v1.flink;
+/*
+package me.samei.xtool.esreporter.v1.flink.reporter;
+
+import me.samei.xtool.esreporter.v1.flink.util.GroupedMetrics;
+import me.samei.xtool.esreporter.v1.flink.util.Select;
 
 public class BulkReporter extends AbstractReporter {
 
@@ -19,3 +23,4 @@ public class BulkReporter extends AbstractReporter {
 
 }
 
+*/

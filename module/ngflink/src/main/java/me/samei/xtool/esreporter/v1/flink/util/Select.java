@@ -1,4 +1,4 @@
-package me.samei.xtool.esreporter.v1.flink;
+package me.samei.xtool.esreporter.v1.flink.util;
 
 import org.apache.flink.metrics.Metric;
 import org.apache.flink.metrics.MetricGroup;
@@ -114,7 +114,7 @@ public interface Select {
             if (_toString == null) {
                 StringBuilder builder = new StringBuilder()
                         .append(getClass().getName()).append("(")
-                        .append(" vars: [");
+                        .append(" keys: [");
 
                 for (String var: vars) {
                     builder.append(var).append(", ");
@@ -139,6 +139,5 @@ public interface Select {
         static public CheckForVariables forJobOpts(String name, boolean returnName) {
             return new CheckForVariables(JOB_OPTS_VARS,name, returnName);
         }
-
     }
 }

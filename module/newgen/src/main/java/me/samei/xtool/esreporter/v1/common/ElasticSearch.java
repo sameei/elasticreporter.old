@@ -10,7 +10,6 @@ import java.net.URL;
 
 public class ElasticSearch {
 
-
     public static String indexDocument = "doc";
 
     private final String host;
@@ -28,9 +27,9 @@ public class ElasticSearch {
         this.host = host;
     }
 
-    public boolean put(Report report) throws IOException {
+    public void put(Report report) throws IOException {
 
-        String url = genURL(report.index, report.time);
+        String url = genURL(report);
 
         if (logger.isTraceEnabled()) logger.trace("PUT, Index: {}, Time: {}, GeneratedURL: {}", report.index, report.time, url);
 
@@ -80,7 +79,6 @@ public class ElasticSearch {
                     http.getResponseCode(), http.getResponseMessage(),
                     body.getBytes().length
             );
-            return true;
         } else {
             if (logger.isWarnEnabled()) logger.warn(
                     "PUT, Index: {}, Time: {}, URL: {}, RequestBodyLen: {}, Response({}): {}, ResponseBodyLen: {}, ResponseBody: {}, Request: {}",
@@ -90,17 +88,17 @@ public class ElasticSearch {
                     body.getBytes().length,
                     body, report.body
             );
-            return false;
+            throw new RuntimeException("Unable to PUT Report! URL: " + url);
         }
     }
 
-    private String genURL(String index, long time) {
+    private String genURL(Report report) {
         return new StringBuilder()
                 .append(this.host)
                 .append("/")
-                .append(index).append("/")
+                .append(report.index).append("/")
                 .append(indexDocument).append("/")
-                .append(Long.toString(time))
+                .append(report.id)
                 .toString();
     }
 

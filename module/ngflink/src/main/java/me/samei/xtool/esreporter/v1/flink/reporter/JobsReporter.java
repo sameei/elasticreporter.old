@@ -1,6 +1,10 @@
-package me.samei.xtool.esreporter.v1.flink;
+/*
+package me.samei.xtool.esreporter.v1.flink.reporter;
 
-public class JobsReporter extends AbstractReporter {
+import me.samei.xtool.esreporter.v1.flink.util.GroupedMetrics;
+import me.samei.xtool.esreporter.v1.flink.util.Select;
+
+public class JobsReporter extends InitAbstract {
 
     private static String[] _tokens = {
             "taskSlotsAvailable",
@@ -23,3 +27,4 @@ public class JobsReporter extends AbstractReporter {
     @Override
     protected Select select() { return _select; }
 }
+*/
