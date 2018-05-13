@@ -40,10 +40,8 @@ public abstract class AbstractReporter extends ReporterInitializer implements Sc
 
         long time = System.currentTimeMillis();
 
-        Collection<Value> values = metrics().collect();
-
         try {
-            underlay.report(time, values);
+            underlay.report(time, metrics().collect(), metrics().allVars());
         } catch (Throwable cause) {
             logger.warn("Failure, Time: " + time, cause);
         }

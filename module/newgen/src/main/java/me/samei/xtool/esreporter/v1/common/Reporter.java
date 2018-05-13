@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 public class Reporter implements Formatter {
 
@@ -25,11 +26,11 @@ public class Reporter implements Formatter {
         this.logger = LoggerFactory.getLogger(getClass());
     }
 
-    public void report(long time, Collection<Value> values) throws IOException {
+    public void report(long time, Collection<Value> values, Map<String, String> vars) throws IOException {
 
         if (logger.isTraceEnabled()) logger.trace("Report, Time: {}, Values({}) ...", time, values.size());
 
-        Report report = reporter.generate(time, values, formatter);
+        Report report = reporter.generate(time, values, vars, formatter);
 
         if (logger.isTraceEnabled()) logger.trace(
                 "Report, Time: {}, Index: {}, Body({}) ...",

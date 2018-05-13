@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 public class MetaData {
 
@@ -103,6 +104,18 @@ public class MetaData {
         values.add(formatter.formatString(indexNameKey, index));
 
         values.add(formatter.formatString(sourceIdKey, sourceId));
+
+        return values;
+    }
+
+    public Collection<Value> convert(Map<String, String> vars, Formatter formatter) {
+
+        ArrayList<Value> values = new ArrayList<>(vars.size());
+
+        for (Map.Entry<String, String> item: vars.entrySet()) {
+            Value value = formatter.formatString(keyWith(item.getKey()), item.getValue());
+            values.add(value);
+        }
 
         return values;
     }

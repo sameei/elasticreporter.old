@@ -37,6 +37,10 @@ public class GroupedMetrics {
 
     protected final Map<String, String> vars = new HashMap<>();
     protected final Map<String, Integer> varsCount = new HashMap<>();
+    public Map<String,String> allVars() { return vars; }
+
+    private int countMetrics = 0;
+    public int size() { return countMetrics; }
 
     protected void addVar(String key, String val) {
         int count = varsCount.getOrDefault(key, 0);
@@ -79,7 +83,9 @@ public class GroupedMetrics {
             meters.put((Meter) metric, cntr);
         } else {
             logger.warn("Add, Unknown Metric Type: {}, Key: {}", metric.getClass().getName(), key);
+            countMetrics -= 1;
         }
+        countMetrics += 1;
     }
 
     public void remove(String key, Metric metric, String name, MetricGroup group) {
@@ -93,7 +99,9 @@ public class GroupedMetrics {
             meters.remove((Meter) metric);
         } else {
             logger.warn("Remove, Unknown Metric Type: {}, Key: {}", metric.getClass().getName(), key);
+            countMetrics += 1;
         }
+        countMetrics -= 1;
     }
 
     protected Collection<Value> collect() {
@@ -133,7 +141,7 @@ public class GroupedMetrics {
         return result.values();
     }
 
-    protected Collection<Value> collectVars(MetaData meta) {
+    /*protected Collection<Value> collectVars(MetaData meta) {
         ArrayList<Value> list = new ArrayList<>();
         for (Map.Entry<String, String> item: vars.entrySet()) {
             String key = meta.keyWith("var" + "." + item.getKey());
@@ -141,7 +149,7 @@ public class GroupedMetrics {
             list.add(value);
         }
         return list;
-    }
+    }*/
 
 
 }

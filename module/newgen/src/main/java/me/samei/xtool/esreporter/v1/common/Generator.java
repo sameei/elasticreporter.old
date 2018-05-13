@@ -26,13 +26,18 @@ public class Generator {
         staticVars.put("source_id", sourceId);
     }
 
-    public Report generate(long time, Collection<Value> values, Formatter formatter) {
+    public Report generate(long time, Collection<Value> values, Map<String,String> vars, Formatter formatter) {
 
-        String indexName = index.generate(time, staticVars);
+        HashMap<String, String> allVars = new HashMap<>();
+        allVars.putAll(staticVars);
+        allVars.putAll(vars);
+
+        String indexName = index.generate(time, allVars);
 
         ArrayList<Value> all = new ArrayList<>(values);
 
         all.addAll(metadata.generate(time, indexName, sourceId, formatter));
+        all.addAll(metadata.convert(vars, formatter));
 
         if (all.size() == 0) return new Report(time, indexName, "{}");
         else {

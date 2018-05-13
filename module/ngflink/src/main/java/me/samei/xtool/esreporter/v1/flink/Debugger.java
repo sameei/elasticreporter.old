@@ -9,6 +9,7 @@ import org.apache.flink.metrics.reporter.Scheduled;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Debugger extends ReporterInitializer implements Scheduled {
@@ -18,6 +19,8 @@ public class Debugger extends ReporterInitializer implements Scheduled {
     private ElasticSearch elastic;
 
     private String index;
+
+    private HashMap<String, String> empty = new HashMap<String, String>();
 
     protected Collection<Value> collect(String subject, long time, Metric metric, String name, MetricGroup group) {
 
@@ -47,7 +50,7 @@ public class Debugger extends ReporterInitializer implements Scheduled {
         try {
             long now = System.currentTimeMillis();
             Collection<Value> values = collect("AddMetric", now, metric, metricName, group);
-            underlay.report(now, values);
+            underlay.report(now, values, empty);
         } catch (Exception cause) {
             logger.error("ReportFailure: " + cause.getMessage(), cause);
         }
@@ -58,7 +61,7 @@ public class Debugger extends ReporterInitializer implements Scheduled {
         try {
             long now = System.currentTimeMillis();
             Collection<Value> values = collect("DeleteMetric", now, metric, metricName, group);
-            underlay.report(now, values);
+            underlay.report(now, values, empty);
         } catch (Exception cause) {
             logger.error("ReportFailure: " + cause.getMessage(), cause);
         }

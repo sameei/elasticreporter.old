@@ -76,11 +76,14 @@ public interface Select {
 
         private final String name;
 
+        private final boolean returnName;
+
         private final Logger logger = LoggerFactory.getLogger(getClass());
 
-        public CheckForVariables(String[] vars, String name) {
+        public CheckForVariables(String[] vars, String name, boolean returnName) {
             this.vars = vars;
             this.name = name;
+            this.returnName = returnName;
         }
 
         public boolean check(String name) {
@@ -91,12 +94,14 @@ public interface Select {
         }
 
         @Override
-        public String apply(Metric metric, String name, MetricGroup group) {
+        public String apply(Metric metric, String metricName, MetricGroup group) {
             for (Map.Entry<String, String> var: group.getAllVariables().entrySet()) {
-                if (check(name)) {
-                    String id = group.getMetricIdentifier(name);
-                    if (logger.isTraceEnabled()) logger.trace("{}, Matched, ID: {}", name, id);
-                    return id;
+                if (check(metricName)) {
+                    String id = (!returnName || logger.isTraceEnabled()) ? group.getMetricIdentifier(metricName) : null;
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("{}, Matched, Name: {}, ID: {}", name, metricName, id);
+                    }
+                    return returnName ? metricName : id;
                 }
             }
             return null;
@@ -125,25 +130,15 @@ public interface Select {
             return _toString;
         }
 
-    }
+        static public String[] JOB_TASK_VARS = {"<job_name>", "<task_name>", "<subtask_index>"};
+        static public CheckForVariables forJobTask(String name, boolean returnName) {
+            return new CheckForVariables(JOB_TASK_VARS,name, returnName);
+        }
 
-    public static class JobTask implements Select {
-
-        public static final String JobTaskName = "<task_name>";
-        public static final String JobName = "<job_name>";
-        public static final String SubTask = "<subtask_index>";
-
-        @Override
-        public String apply(Metric metric, String name, MetricGroup group) {
-
-            Map<String, String> vars = group.getAllVariables();
-            String value = vars.getOrDefault(JobTaskName, null);
-
-            if (value == null) return null;
-
-            return vars.get(JobName) + "." + value + "." + vars.get(SubTask);
+        static public String[] JOB_OPTS_VARS = {"<job_name>", "<operator_name>", "<subtask_index>"};
+        static public CheckForVariables forJobOpts(String name, boolean returnName) {
+            return new CheckForVariables(JOB_OPTS_VARS,name, returnName);
         }
 
     }
-
 }
