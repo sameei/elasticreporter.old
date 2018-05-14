@@ -1,10 +1,13 @@
 package me.samei.xtool.esreporter.v1.common;
 
+import org.slf4j.LoggerFactory;
+
 import javax.print.DocFlavor;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 public class IndexName {
 
@@ -54,7 +57,7 @@ public class IndexName {
 
         if (vars != null && !vars.isEmpty()) {
             for(Map.Entry<String, String> item: vars.entrySet()) {
-                temp = temp.replaceAll(item.getKey(), item.getValue());
+                temp = temp.replaceAll(item.getKey(), Matcher.quoteReplacement(item.getValue()));
             }
         }
 

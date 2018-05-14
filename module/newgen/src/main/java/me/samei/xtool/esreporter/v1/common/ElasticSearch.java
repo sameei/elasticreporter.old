@@ -99,7 +99,8 @@ public class ElasticSearch {
                 .append(report.index).append("/")
                 .append(indexDocument).append("/")
                 .append(report.id)
-                .toString();
+                .toString()
+                .replaceAll("[\\s\\(\\)\\<\\>]", "-");
     }
 
     private String readStream(InputStream input) throws IOException {

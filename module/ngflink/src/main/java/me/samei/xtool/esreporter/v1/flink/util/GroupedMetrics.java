@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class GroupedMetrics {
 
-    private static class Container {
+    public static class Container {
         public final String key;
         public final String name;
         public final Metric metric;

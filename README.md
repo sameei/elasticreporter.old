@@ -21,6 +21,16 @@ metrics.reporter.jobtask.index-pattern: task-<job_name>-<year>-<month>-<day_of_m
 metrics.reporter.jobtask.identity-pattern: <millis>
 metrics.reporter.jobtask.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.jobtask.datetime-zone: UTC
+
+
+metrics.reporter.jobtask.class: me.samei.xtool.esreporter.v1.flink.reporter.JobTask
+metrics.reporter.jobtask.source-id: single-node
+metrics.reporter.jobtask.es-url: http://localhost:9200
+metrics.reporter.jobtask.index-pattern: task-<job_name>-<year>-<month>-<day_of_month>
+metrics.reporter.jobtask.identity-pattern: <millis>-<job_id>-<tm_id>-<task_id>-<operator_id>-<subtask_index>
+metrics.reporter.jobtask.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.jobtask.datetime-zone: UTC
+
 ```
 
 ```
