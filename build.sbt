@@ -6,7 +6,11 @@ lazy val common = Seq(
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % Test,
     libraryDependencies ++= Seq(
         "circe-core", "circe-generic", "circe-parser"
-    ).map { m => "io.circe" %% m % "0.9.3" % Test }
+    ).map { m => "io.circe" %% m % "0.9.3" % Test },
+    scalacOptions ++= Seq(
+        "-deprecation",
+        "-feature"
+    )
 )
 
 def define(moduleName : String, artifact : String, dirName : String) = {
@@ -32,6 +36,14 @@ def flink(moduleName : String, flinkVersion : String) = {
 }
 
 // ============================================================
+
+lazy val cmn = define(
+    "common",
+    "esreporter-common",
+    "common"
+).settings(
+    libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided
+)
 
 lazy val xjava = define("xjava", "xjava", "xjava")
 
