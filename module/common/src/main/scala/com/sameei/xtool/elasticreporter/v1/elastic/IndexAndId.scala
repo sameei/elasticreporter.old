@@ -1,7 +1,5 @@
 package com.sameei.xtool.elasticreporter.v1.elastic
 
-import com.sameei.xtool.elasticreporter.v1.common.ReportContext
-
 import scala.util.matching.Regex
 
 case class IndexAndId(
@@ -13,7 +11,7 @@ case class IndexAndId(
         pattern: String,
         vars: Map[String, String]
     )= {
-        // https://stackoverflow.com/questions/9658701/scala-regex-replaceallin-cant-replace-when-replace-string-looks-like-a-regex
+        // https://stackoverflow.com/questions/9658701
         vars.foldLeft(pattern) { case (pt, (k,v)) => pt.replaceAll(k, Regex.quoteReplacement(v)) }
     }
 

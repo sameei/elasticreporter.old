@@ -1,8 +1,14 @@
 package com.sameei.xtool.elasticreporter.v1.common
 
+import com.sameei.xtool.elasticreporter.v1.common
+
 object FormatterV1 {
 
-    case class Val(key: String, value: String, tipe: Value.Type) extends Value
+    case class Value(key: String, value: String, tipe: common.Value.Type) extends common.Value
+
+    def simple(key: String, value: String) = Value(key, value, common.Value.Simple)
+
+    def qouted(key: String, value: String) = Value(key, value, common.Value.Qouted)
 
     case class FormatException(
         desc: String,
@@ -13,9 +19,11 @@ object FormatterV1 {
 
 }
 
-class FormatterV1 extends Formatter[FormatterV1.Val] {
+class FormatterV1 extends Formatter {
 
     import FormatterV1._
+
+    type Val = FormatterV1.Value
 
     private val keyValidationRegex = "[\\|/\"\'\n\r]".r
 
@@ -36,7 +44,7 @@ class FormatterV1 extends Formatter[FormatterV1.Val] {
     override def formatString(rawKey : String, rawVal : String): Val  = {
         checkInvalidKey(rawKey, rawVal)
         checkInvalidStringValue(rawKey, rawVal)
-        Val(rawKey, rawVal, Value.Qouted)
+        qouted(rawKey, rawVal)
     }
 
     override def formatBool(rawKey : String, rawVal : Boolean) : Val = {
@@ -45,39 +53,39 @@ class FormatterV1 extends Formatter[FormatterV1.Val] {
             case false => "false"
         }
         checkInvalidKey(rawKey, value)
-        Val(rawKey, value, Value.Simple)
+        simple(rawKey, value)
     }
 
     override def formatInt(rawKey : String, rawVal : Int) : Val = {
         val value = rawVal.toString
         checkInvalidKey(rawKey, value)
-        Val(rawKey, value, Value.Simple)
+        simple(rawKey, value)
     }
 
     override def formatLong(rawKey : String, rawVal : Long) : Val = {
         val value = rawVal.toString
         checkInvalidKey(rawKey, value)
-        Val(rawKey, value, Value.Simple)
+        simple(rawKey, value)
     }
 
     override def formatFloat(rawKey : String, rawVal : Float) : Val = {
         val value = rawVal.toString
         checkInvalidKey(rawKey, value)
-        Val(rawKey, value, Value.Simple)
+        simple(rawKey, value)
     }
 
     override def formatDouble(rawKey : String, rawVal : Double) : Val = {
         val value = rawVal.toString
         checkInvalidKey(rawKey, value)
-        Val(rawKey, value, Value.Simple)
+        simple(rawKey, value)
     }
 
     protected def append(value: Val)(implicit buf: StringBuilder) = {
         buf.append('"').append(value.key).append("\": ")
         value.tipe match {
-            case Value.Simple =>
+            case common.Value.Simple =>
                 buf.append(value.value)
-            case Value.Qouted =>
+            case common.Value.Qouted =>
                 buf.append('"').append(value.value).append('"')
         }
     }

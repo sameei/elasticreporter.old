@@ -3,18 +3,14 @@ package com.sameei.xtool.elasticreporter.v1.common
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-object ReportContextV1 {
-    type Val = FormatterV1.Val
-    type Formatter = FormatterV1
-    type Type = ReportContext[Val, Formatter]
-}
-
 abstract class ReportContextV1(
     override val id : String,
     override val datetimeFormatter : DateTimeFormatter,
     override val time: data.Millis = System.currentTimeMillis(),
     val keyPrefix: String = "@meta"
-) extends ReportContextV1.Type {
+) extends ReportContext {
+
+    override type Formatter = FormatterV1
 
     override val formatter = new FormatterV1
 
@@ -32,7 +28,7 @@ abstract class ReportContextV1(
       *
       * @return
       */
-    /*override def vals : Seq[FormatterV1.Val] = Seq(
+    /*override def vals : Seq[formatter.Val] = Seq(
         formatter.formatLong(keyFor("time.millis"), time),
         formatter.formatString(keyFor("time.formatted"), localDateTimeAsString)
     )*/

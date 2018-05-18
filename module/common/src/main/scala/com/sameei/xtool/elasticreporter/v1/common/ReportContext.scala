@@ -2,9 +2,11 @@ package com.sameei.xtool.elasticreporter.v1.common
 
 import com.sameei.xtool.elasticreporter.v1.common
 
-trait ReportContext[Val <: Value, Formatter <: common.Formatter[Val]] {
+trait ReportContext {
 
-    def formatter: Formatter
+    type Formatter <: common.Formatter
+
+    val formatter: Formatter
 
     def keyFor(name: String): String
 
@@ -20,7 +22,7 @@ trait ReportContext[Val <: Value, Formatter <: common.Formatter[Val]] {
       * Such as 'time', 'host', ...
       * @return
       */
-    def vals: Seq[Val]
+    def vals: Seq[formatter.Val]
 
     /**
       * Prepared variables for this context
@@ -31,18 +33,5 @@ trait ReportContext[Val <: Value, Formatter <: common.Formatter[Val]] {
     def id: String
 
     def localDateTimeAsString: String = localdatetime.format(datetimeFormatter)
-
-}
-
-object ReportContext {
-
-    // ?!
-    object CustomVar {
-        val Year = "<year>"
-        val Month = "<month>"
-        val DayOfMonth = "<day_of_month>"
-        val Millis = "<millis>"
-        val SourceId = "<source_id>"
-    }
 
 }

@@ -1,6 +1,8 @@
 package com.sameei.xtool.elasticreporter.v1.common
 
-trait Formatter[Val <: Value] {
+trait Formatter {
+
+    type Val <: Value
 
     def formatString(rawKey: String, rawVal: String) : Val
 
