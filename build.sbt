@@ -1,4 +1,4 @@
-import sbt.Global
+
 // ============================================================
 
 lazy val common = Seq(
@@ -23,28 +23,54 @@ def define(moduleName : String, artifact : String, dirName : String) = {
 def flink(moduleName : String, flinkVersion : String) = {
     define(
         moduleName,
-        s"elasticsearch-metric-reporter-flink-${flinkVersion}",
+        s"elastic-reporter-flink-${flinkVersion}",
         moduleName
     ).settings(
         libraryDependencies += "org.apache.flink" % "flink-metrics-core" % flinkVersion % Provided,
         libraryDependencies += "org.apache.flink" % "flink-core" % flinkVersion % Provided,
         libraryDependencies += "org.apache.flink" %% "flink-runtime" % flinkVersion % Provided,
         // libraryDependencies += "xmlenc" % "xmlenc" % "0.52" % Provided,
-        assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
-        assemblyJarName in assembly := s"es-reporter-flink-${flinkVersion}.jar"
-    ).dependsOn(base)
+        assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+    )
 }
 
 // ============================================================
 
 lazy val cmn = define(
     "common",
-    "esreporter-common",
+    "elastic-reporter-common",
     "common"
 ).settings(
     libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided
 )
 
+lazy val flink14 = flink("flink14", "1.4.2").dependsOn(cmn)
+
+lazy val examplejob = {
+
+    val flinkDependencies = Seq("flink-scala", "flink-streaming-scala") map { m =>
+        "org.apache.flink" %% m % "1.4.2" % Provided
+    }
+
+    define("examplejob", "examplejob", "examplejob")
+        .settings(
+            assembly / mainClass := Some("org.example.Job"),
+            libraryDependencies ++= flinkDependencies,
+            Compile / run := Defaults.runTask(Compile / fullClasspath,
+                Compile / run / mainClass,
+                Compile / run / runner
+            ).evaluated,
+            Compile / run / fork := true,
+            Global / cancelable := true,
+            assembly / assemblyOption := (assembly / assemblyOption).value.copy(includeScala = false)
+        )
+}
+
+lazy val root = (project in file(".")).aggregate(cmn, flink14, examplejob)
+
+// ============================================================
+
+/*
 lazy val xjava = define("xjava", "xjava", "xjava")
 
 lazy val base = define(
@@ -71,25 +97,6 @@ lazy val newgen = define(
 ).dependsOn(xjava)
 
 lazy val newgenflink14 = flink("ngflink", "1.4.2").dependsOn(newgen)
-
-lazy val examplejob = {
-
-    val flinkDependencies = Seq("flink-scala", "flink-streaming-scala") map { m =>
-        "org.apache.flink" %% m % "1.4.2" % Provided
-    }
-
-    define("examplejob", "examplejob", "examplejob")
-        .settings(
-            assembly / mainClass := Some("org.example.Job"),
-            libraryDependencies ++= flinkDependencies,
-            Compile / run := Defaults.runTask(Compile / fullClasspath,
-                Compile / run / mainClass,
-                Compile / run / runner
-            ).evaluated,
-            Compile / run / fork := true,
-            Global / cancelable := true,
-            assembly / assemblyOption := (assembly / assemblyOption).value.copy(includeScala = false)
-        )
-}
+*/
 
 // ============================================================

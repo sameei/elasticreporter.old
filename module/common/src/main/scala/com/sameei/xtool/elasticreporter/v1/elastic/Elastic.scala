@@ -19,7 +19,7 @@ case class Elastic(name: String, host: String) {
     Try {
         require(host != null, "'host' can't be null!")
         require(!host.isEmpty, "'host' can't be empty")
-        new URL(host).asInstanceOf[HttpURLConnection]
+        new URL(host).openConnection().asInstanceOf[HttpURLConnection]
     }.map { http =>
         http.connect()
         val body = readStream(http.getInputStream)
@@ -36,7 +36,7 @@ case class Elastic(name: String, host: String) {
 
         val url = s"${host}/${report.index}/doc/${report.doc}"
 
-        val http = new URL(url).asInstanceOf[HttpURLConnection]
+        val http = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
 
         http setUseCaches false
         http setDoOutput true

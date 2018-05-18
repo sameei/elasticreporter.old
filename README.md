@@ -86,3 +86,53 @@ metric.reporter.debug.logger-name: MetricDebugger
 
 
 
+```
+metrics.reporter.debug.class: me.samei.xtool.esreporter.v1.flink.reporter.Debugger
+metrics.reporter.debug.source-id: single-node
+metrics.reporter.debug.es-url: http://localhost:9200
+metrics.reporter.debug.index-pattern: single-index
+metrics.reporter.debug.identity-pattern: <millis>
+metrics.reporter.debug.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.debug.datetime-zone: UTC
+
+metrics.reporter.jobtask.class: me.samei.xtool.esreporter.v1.flink.reporter.JobTask
+metrics.reporter.jobtask.source-id: single-node
+metrics.reporter.jobtask.es-url: http://localhost:9200
+metrics.reporter.jobtask.index-pattern: task-<job_name>-<year>-<month>-<day_of_month>
+metrics.reporter.jobtask.identity-pattern: <millis>-<job_id>-<tm_id>-<task_id>-<operator_id>-<subtask_index>
+metrics.reporter.jobtask.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.jobtask.datetime-zone: UTC
+```
+
+
+```
+
+metrics.reporters: jvmstat, jvmstat-jm, jvmstat-tm
+
+metrics.reporter.jvmstat.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.JVMStat
+metrics.reporter.jvmstat.elastic-url: http://localhost:9200
+metrics.reporter.jvmstat.source-id: single-node
+metrics.reporter.jvmstat.index-pattern: jvmstat-<year>-<month>-<day_of_month>
+metrics.reporter.jvmstat.id-pattern: jvmstat-<source_id>-<millis>
+metrics.reporter.jvmstat.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.jvmstat.zone: UTC
+
+
+metrics.reporter.jvmstat-jm.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.JVMStat$OnlyJobManager
+metrics.reporter.jvmstat-jm.elastic-url: http://localhost:9200
+metrics.reporter.jvmstat-jm.source-id: single-node-jm
+metrics.reporter.jvmstat-jm.index-pattern: jvmstat-jm-<year>-<month>-<day_of_month>
+metrics.reporter.jvmstat-jm.id-pattern: jvmstat-<source_id>-<millis>
+metrics.reporter.jvmstat-jm.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.jvmstat-jmjobmanager.zone: UTC
+
+metrics.reporter.jvmstat-tm.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.JVMStat$OnlyTaskManager
+metrics.reporter.jvmstat-tm.elastic-url: http://localhost:9200
+metrics.reporter.jvmstat-tm.source-id: single-node-tm
+metrics.reporter.jvmstat-tm.index-pattern: jvmstat-tm-<year>-<month>-<day_of_month>
+metrics.reporter.jvmstat-tm.id-pattern: jvmstat-<source_id>-<millis>
+metrics.reporter.jvmstat-tm.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.jvmstat-tm.zone: UTC
+
+
+```

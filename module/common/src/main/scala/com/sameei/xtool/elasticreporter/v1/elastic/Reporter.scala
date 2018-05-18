@@ -1,6 +1,6 @@
 package com.sameei.xtool.elasticreporter.v1.elastic
 
-import java.time.ZoneId
+import java.time.{LocalDateTime, ZoneId}
 import java.time.format.DateTimeFormatter
 
 import com.sameei.xtool.elasticreporter.v1.{common, elastic}
@@ -27,6 +27,7 @@ class Reporter(name: String, config: Reporter.Config){
         s"${name}-${System.currentTimeMillis()}",
         dtf,
         time,
+        config.zone,
         config.source
     )
 
@@ -37,11 +38,18 @@ class Reporter(name: String, config: Reporter.Config){
         if (logger.isTraceEnabled())
             logger.trace(s"Apply ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}")
 
-        val xs = context.vals
+        val vars = {
+            context.vars ++ gm.vars(context)
+        }
 
-        val values = gm.metrics(context)
+        val values = {
 
-        val vars = gm.vars(context)
+            context.vals ++
+                gm.metrics(context) ++
+                vars.map { case (k,v) =>
+                    context.formatter.formatString(context.keyFor(s"var.${k}"), v)
+                }
+        }
 
         if (logger.isTraceEnabled())
             logger.trace(s"Apply ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}, Values(${values.size}): ${values}, Vars(${vars.size}): ${vars}")
@@ -85,18 +93,24 @@ object Reporter {
         id: String,
         dtf: DateTimeFormatter,
         time: common.data.Millis,
+        zone: String,
         source: String
     ) extends common.ReportContextV1(id, dtf, time, "@meta") {
 
+        override val localdatetime : LocalDateTime = {
+            val i = java.time.Instant.ofEpochMilli(time).atZone(ZoneId.of(zone))
+            LocalDateTime.from(i)
+        }
+
         override def vals : Seq[formatter.Val] = Seq(
-            formatter.formatLong("time.millis", time),
-            formatter.formatString("time.formatted", localDateTimeAsString),
-            formatter.formatString("source.id", source)
+            formatter.formatLong(keyFor("time.millis"), time),
+            formatter.formatString(keyFor("time.formatted"), localDateTimeAsString),
+            formatter.formatString(keyFor("source.id"), source)
         )
 
         override def vars : Map[String, String] = Map(
-             CustomVar.Year -> localdatetime.getYear.toString,
-            CustomVar.Month -> localdatetime.getMonth.toString,
+            CustomVar.Year -> localdatetime.getYear.toString,
+            CustomVar.Month -> localdatetime.getMonthValue.toString,
             CustomVar.DayOfMonth -> localdatetime.getDayOfMonth.toString,
             CustomVar.Millis -> time.toString,
             CustomVar.SourceId -> source

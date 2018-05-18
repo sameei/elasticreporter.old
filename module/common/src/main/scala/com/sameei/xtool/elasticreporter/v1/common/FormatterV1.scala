@@ -27,18 +27,18 @@ class FormatterV1 extends Formatter {
 
     private val keyValidationRegex = "[\\|/\"\'\n\r]".r
 
-    private def isInvalidKey(key: String) =
+    protected def isInvalidKey(key: String) =
         keyValidationRegex.findFirstIn(key).isDefined
 
-    private def checkInvalidKey(key: String, value: String) =
+    protected def checkInvalidKey(key: String, value: String) =
         if (isInvalidKey(key)) throw new FormatException(s"Invalid Key to Format: '${key}'", key, value, None)
 
     private val valueValidationRegex = "[\"\n\r]".r
 
-    private def inInvalidValue(value: String) =
+    protected def inInvalidValue(value: String) =
         valueValidationRegex.findFirstIn(value).isDefined
 
-    private def checkInvalidStringValue(key: String, value: String) =
+    protected def checkInvalidStringValue(key: String, value: String) =
         if (inInvalidValue(value)) throw new FormatException(s"Invlaid Value to Format: '${value}'", key, value, None)
 
     override def formatString(rawKey : String, rawVal : String): Val  = {
@@ -86,7 +86,7 @@ class FormatterV1 extends Formatter {
             case common.Value.Simple =>
                 buf.append(value.value)
             case common.Value.Qouted =>
-                buf.append('"').append(value.value).append("\" ")
+                buf.append('"').append(value.value).append('"')
         }
     }
 
@@ -101,7 +101,10 @@ class FormatterV1 extends Formatter {
             case head :: Nil => append(head)
             case head :: tail=>
                 append(head)
-                tail.foreach { i => buf.append(',').append(i)}
+                tail.foreach { i =>
+                    buf.append(',').append(' ')
+                    append(i)
+                }
         }
 
         buf.append("}").result()

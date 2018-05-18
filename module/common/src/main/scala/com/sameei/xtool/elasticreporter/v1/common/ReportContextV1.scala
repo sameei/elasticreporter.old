@@ -1,6 +1,6 @@
 package com.sameei.xtool.elasticreporter.v1.common
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneId}
 import java.time.format.DateTimeFormatter
 
 abstract class ReportContextV1(
@@ -15,11 +15,6 @@ abstract class ReportContextV1(
     override val formatter = new FormatterV1
 
     override def keyFor(name : String) : String = s"${keyPrefix}.${name}"
-
-    override val localdatetime : LocalDateTime = {
-        val i = java.time.Instant.ofEpochMilli(time)
-        LocalDateTime.from(i)
-    }
 
     /**
       * Prepared values for this context

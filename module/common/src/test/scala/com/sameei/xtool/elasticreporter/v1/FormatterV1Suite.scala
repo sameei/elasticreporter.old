@@ -105,4 +105,18 @@ class FormatterV1Suite extends FlatSpec with Matchers {
 
     }
 
+    it must "generate a valid list with multiple values" in {
+
+        val json = formatter.format(
+            formatter.formatString("name", "Reza") ::
+            formatter.formatInt("age", 29) :: Nil
+        )
+
+        val parsed = parse(json)
+
+        info(parsed.toString.replace("\n", ""))
+
+        parsed.isRight shouldBe true
+    }
+
 }

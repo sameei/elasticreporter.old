@@ -18,7 +18,7 @@ case class IndexAndId(
         // https://github.com/elastic/elasticsearch/issues/6736
         vars.foldLeft(pattern) { case (pt, (k,v)) =>
             pt.replaceAll(k, Regex.quoteReplacement(v))
-        } replaceAll (invalidCharsRegexPattern, "-") replaceAll("(-{1,})", "-")
+        } replaceAll (invalidCharsRegexPattern, "-") replaceAll("(-{1,})", "-") toLowerCase
     }
 
     def index(vars: Map[String, String]): String = generate(indexPattern, vars)
