@@ -86,7 +86,7 @@ class FormatterV1 extends Formatter {
             case common.Value.Simple =>
                 buf.append(value.value)
             case common.Value.Qouted =>
-                buf.append('"').append(value.value).append('"')
+                buf.append('"').append(value.value).append("\" ")
         }
     }
 
@@ -96,7 +96,7 @@ class FormatterV1 extends Formatter {
 
         buf.append("{")
 
-        val (head,tail) = values match {
+        values match {
             case Nil => // nothing
             case head :: Nil => append(head)
             case head :: tail=>
