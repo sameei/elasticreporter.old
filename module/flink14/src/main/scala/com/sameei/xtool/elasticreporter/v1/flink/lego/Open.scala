@@ -1,8 +1,9 @@
 package com.sameei.xtool.elasticreporter.v1.flink.lego
 
 import com.sameei.xtool.elasticreporter.v1.elastic
+import com.sameei.xtool.elasticreporter.v1.elastic.Reporter
 import org.apache.flink.metrics.MetricConfig
-import org.apache.flink.metrics.reporter.{MetricReporter}
+import org.apache.flink.metrics.reporter.MetricReporter
 import org.slf4j.LoggerFactory
 
 trait Open extends MetricReporter { self =>
@@ -14,6 +15,8 @@ trait Open extends MetricReporter { self =>
     protected var reporter: elastic.Reporter = null
 
     protected val logger = LoggerFactory getLogger s"${name}.reporter"
+
+    protected val contextfactory: elastic.Reporter.ContextFactory = new Reporter.ContextFactory.Default
 
     override def open(config : MetricConfig) : Unit = {
 
@@ -28,7 +31,7 @@ trait Open extends MetricReporter { self =>
             zone = config.getNonEmptyString("zone")
         )
 
-        self.reporter = new elastic.Reporter(name, self.config)
+        self.reporter = new elastic.Reporter(name, self.config, contextfactory)
 
         logger info s"Open, Config: ${self.config}"
     }

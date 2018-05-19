@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import scala.util.{Failure, Success}
 
 
-class Reporter(name: String, config: Reporter.Config){
+class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextFactory){
 
     private val logger = LoggerFactory.getLogger(s"${name}")
 
@@ -24,17 +24,9 @@ class Reporter(name: String, config: Reporter.Config){
 
     private val dtf = DateTimeFormatter.ofPattern(config.datetimePattern).withZone(zoneId)
 
-    private def contextAt(time: Long) = new elastic.Reporter.Context(
-        s"${name}.context.${System.currentTimeMillis()}",
-        dtf,
-        time,
-        config.zone,
-        config.source
-    )
-
     def apply(gm : common.GroupedMetrics, time: Long): Unit = {
 
-        implicit val context = contextAt(time)
+        implicit val context = factory.apply(name, time, config)
 
         if (logger.isTraceEnabled())
             logger.trace(s"Apply ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}")
@@ -125,15 +117,15 @@ object Reporter {
         )
     }
 
-    trait ContextFactory {
-        def apply(id: String, time: Long, config: Config): common.ReportContext
+    trait ContextFactory extends ((String, Long, Config) => common.ReportContext) {
+        def apply(namePrefix: String, time: Long, config: Config): common.ReportContext
     }
 
     object ContextFactory {
         class Default extends ContextFactory {
-            def apply(id: String, time: Long, config: Config) =
+            def apply(namePrefix: String, time: Long, config: Config) =
                 new Context(
-                    id, time, config.zone,
+                    s"${namePrefix}.context.${time}", time, config.zone,
                     DateTimeFormatter.ofPattern(config.datetimePattern).withZone(ZoneId.of(config.zone)),
                     config.source
                 )
