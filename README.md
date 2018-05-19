@@ -152,10 +152,18 @@ metrics.reporter.debug-config.zone: UTC
 metrics.reporter.jobtask.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.Job$ByTask
 metrics.reporter.jobtask.elastic-url: http://localhost:9200
 metrics.reporter.jobtask.source-id: single-node
-metrics.reporter.jobtask.index-pattern: <job_name>-<year>-<month>-<day_of_month>
+metrics.reporter.jobtask.index-pattern: task-of-<job_name>-<year>-<month>-<day_of_month>
 metrics.reporter.jobtask.id-pattern: <task_id>-<subtask_index>-<source_id>-<millis>
 metrics.reporter.jobtask.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.jobtask.zone: UTC
+
+metrics.reporter.jobopt.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.Job$ByOperator
+metrics.reporter.jobopt.elastic-url: http://localhost:9200
+metrics.reporter.jobopt.source-id: single-node
+metrics.reporter.jobopt.index-pattern: operator-of-<job_name>-<year>-<month>-<day_of_month>
+metrics.reporter.jobopt.id-pattern: <operator_id>-<subtask_index>-<source_id>-<millis>
+metrics.reporter.jobopt.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.jobopt.zone: UTC
 
 metrics.scope.task: <host>.taskmanager.<tm_id>.<job_name>.<task_name>.<subtask_index>
 metrics.scope.task: FLINK_TM

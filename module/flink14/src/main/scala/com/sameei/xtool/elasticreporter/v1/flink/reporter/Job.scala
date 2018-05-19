@@ -6,6 +6,11 @@ import scala.collection.JavaConverters._
 
 object Job {
 
+    /**
+      * metrics.scope.task
+      * ```<host>.taskmanager.<tm_id>.<job_name>.<task_name>.<subtask_index>```
+      *
+      */
     class ByTask extends ReporterForJob {
 
         val JobName = "<job_name>"
@@ -23,14 +28,11 @@ object Job {
 
         override protected def toMetricName(name : String, metric : Metric, group : MetricGroup) : String = {
 
-            // @Consider
-            // This depends to default value of 'metrics.scope.task' in config
-            // metrics.scope.task: <host>.taskmanager.<tm_id>.<job_name>.<task_name>.<subtask_index>
-            // @todo document this!
-
             val limit = 6
 
-            if (group.getScopeComponents.size < limit) {
+            val scopes = group.getScopeComponents
+
+            if (scopes.size < limit) {
                 logger.warn(
                     s"""
                          |MetricName,
@@ -43,12 +45,61 @@ object Job {
                          |""".stripMargin.replace("\n", " ")
                 )
                 name
-            } else if (group.getScopeComponents.size == limit) {
+            } else if (scopes.size == limit) {
                 name
             } else {
-                s"${group.getScopeComponents.drop(limit).mkString(".")}.${name}"
+                s"${scopes.drop(limit).mkString(".")}.${name}"
             }
         }
+    }
+
+    /**
+      *
+      * metrics.scope.operator
+      * ```<host>.taskmanager.<tm_id>.<job_name>.<operator_name>.<subtask_index>```
+      *
+      */
+    class ByOperator extends ReporterForJob {
+
+        val JobName = "<job_name>"
+        val JobId = "<job_id>"
+        val OperatorName = "<operator_name>"
+        val OperatorId = "<operator_id>"
+        val SubtaskIndex = "<subtask_index>"
+
+        protected override val keys = Array(JobName, JobName, OperatorName, OperatorId, SubtaskIndex)
+
+        override protected def toGroupId(name : String, metric : Metric, group : MetricGroup) : String = {
+            val vars = group.getAllVariables.asScala
+            s"${vars(JobName)}.${vars(OperatorId)}.${vars(SubtaskIndex)}"
+        }
+
+        override protected def toMetricName(name : String, metric : Metric, group : MetricGroup) : String = {
+
+            val limit = 6
+
+            val scopes = group.getScopeComponents
+
+            if (scopes.size < limit) {
+                logger.warn(
+                    s"""
+                         |MetricName,
+                         |Invalid Scope: [${scopes.mkString(",")}],
+                         |Less than ${limit},
+                         |Return Name as MetricName: ${name},
+                         |Desc: It seems that you have change the defualt value of 'metrics.scope.operator';
+                         |this component(${getClass.getName}) needs it be default value:
+                         |<host>.taskmanager.<tm_id>.<job_name>.<operator_name>.<subtask_index>
+                         |""".stripMargin.replace("\n", " ")
+                )
+                name
+            } else if (scopes.size == limit) {
+                name
+            } else {
+                s"${scopes.drop(limit).mkString(".")}.${name}"
+            }
+        }
+
     }
 
 }
