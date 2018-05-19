@@ -16,7 +16,7 @@ trait Open extends MetricReporter { self =>
 
     protected val logger = LoggerFactory getLogger s"${name}.reporter"
 
-    protected val contextfactory: elastic.Reporter.ContextFactory = new Reporter.ContextFactory.Default
+    protected def contextfactory: elastic.Reporter.ContextFactory = new Reporter.ContextFactory.Default
 
     override def open(config : MetricConfig) : Unit = {
 
