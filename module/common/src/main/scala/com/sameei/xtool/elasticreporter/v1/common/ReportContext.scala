@@ -12,6 +12,8 @@ trait ReportContext {
 
     def time : data.Millis
 
+    def zone: String
+
     def localdatetime: java.time.LocalDateTime
 
     def datetimeFormatter: java.time.format.DateTimeFormatter

@@ -33,8 +33,6 @@ class JVMStat extends lego.SingleGroup {
         val id = group.getMetricIdentifier(name)
         keys.find { i => id.endsWith(i) }
     }
-
-    override protected def name : String = getClass.getName
 }
 
 object JVMStat {

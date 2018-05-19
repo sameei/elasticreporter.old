@@ -3,6 +3,7 @@ package com.sameei.xtool.elasticreporter.v1.elastic
 import java.time.{LocalDateTime, ZoneId}
 import java.time.format.DateTimeFormatter
 
+import com.sameei.xtool.elasticreporter.v1.common.{FormatterV1, data}
 import com.sameei.xtool.elasticreporter.v1.{common, elastic}
 import org.slf4j.LoggerFactory
 
@@ -24,7 +25,7 @@ class Reporter(name: String, config: Reporter.Config){
     private val dtf = DateTimeFormatter.ofPattern(config.datetimePattern).withZone(zoneId)
 
     private def contextAt(time: Long) = new elastic.Reporter.Context(
-        s"${name}-${System.currentTimeMillis()}",
+        s"${name}.context.${System.currentTimeMillis()}",
         dtf,
         time,
         config.zone,
@@ -90,12 +91,19 @@ object Reporter {
     )
 
     class Context(
-        id: String,
-        dtf: DateTimeFormatter,
-        time: common.data.Millis,
-        zone: String,
-        source: String
-    ) extends common.ReportContextV1(id, dtf, time, "@meta") {
+        override val id : String,
+        override val time: data.Millis,
+        override val zone: String,
+        override val datetimeFormatter : DateTimeFormatter,
+        source: String,
+        val keyPrefix: String = "@meta"
+    ) extends common.ReportContext { self =>
+
+        override type Formatter = FormatterV1
+
+        override val formatter = new FormatterV1
+
+        override def keyFor(name : String) : String = s"${keyPrefix}.${name}"
 
         override val localdatetime : LocalDateTime = {
             val i = java.time.Instant.ofEpochMilli(time).atZone(ZoneId.of(zone))
@@ -115,6 +123,21 @@ object Reporter {
             CustomVar.Millis -> time.toString,
             CustomVar.SourceId -> source
         )
+    }
+
+    trait ContextFactory {
+        def apply(id: String, time: Long, config: Config): common.ReportContext
+    }
+
+    object ContextFactory {
+        class Default extends ContextFactory {
+            def apply(id: String, time: Long, config: Config) =
+                new Context(
+                    id, time, config.zone,
+                    DateTimeFormatter.ofPattern(config.datetimePattern).withZone(ZoneId.of(config.zone)),
+                    config.source
+                )
+        }
     }
 
     object CustomVar {

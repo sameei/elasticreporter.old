@@ -106,11 +106,11 @@ class GroupedMetrics(
 
             if (logger.isDebugEnabled()) {
                 val id = value.group.getMetricIdentifier(value.name)
-                logger.debug(s"DroppedMEtric, Key: ${value.key}, Vars: ${value.group.getAllVariables.size}, Class: ${value.metric.getClass.getName}, ID: ${id}")
+                logger.debug(s"DropMetric, Key: ${value.key}, Vars: ${value.group.getAllVariables.size}, Class: ${value.metric.getClass.getName}, ID: ${id}")
 
             }
 
-        } else logger.warn(s"AddMEtric, Unexpected Class or Unknown Metric: ${metric.getClass.getName}, ${metric}")
+        } else if (logger.isDebugEnabled) logger.debug(s"DropMetric, Not Found: (${metric.getClass.getName}, ${metric})")
     }
 
     override def metrics[C <: ReportContext](context : C) : Seq[context.formatter.Val] = {
@@ -127,14 +127,25 @@ class GroupedMetrics(
 
         val result = list.toList
 
-        if (logger.isDebugEnabled()) logger.debug(s"Metrics, Count: ${result.size}, Context: ${context.id}")
+        if (logger.isDebugEnabled) {
+            logger.debug(s"Metrics, Count: ${result.size}, Context: ${context.id}")
+
+            if (logger.isTraceEnabled) logger.trace(s"Values(${result.size}): ${result}, Context: ${context.id}")
+        }
+
 
         result
     }
 
     override def vars[C <: ReportContext](context : C) : Map[String, String] = {
-        val result = vars.map { case (k,v) => context.keyFor(k) -> v.value }.toMap
-        if (logger.isDebugEnabled()) logger.debug(s"Vars, Count: ${result.size}, Context: ${context.id}")
+        val result = vars.map { case (k,v) => k -> v.value }.toMap
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(s"Vars, Count: ${result.size}, Context: ${context.id}")
+
+            if (logger.isTraceEnabled) logger.trace(s"Vars(${result.size}): ${result}, Context: ${context.id}")
+        }
+
         result
     }
 }

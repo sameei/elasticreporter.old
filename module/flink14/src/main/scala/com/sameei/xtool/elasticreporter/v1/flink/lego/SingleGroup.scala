@@ -5,6 +5,8 @@ import org.apache.flink.metrics.reporter.{MetricReporter, Scheduled}
 
 abstract class SingleGroup extends Open with Scheduled { self =>
 
+    override protected def name : String = getClass.getName
+
     private var group: GroupedMetrics = null
 
     private val removeQueue = collection.mutable.ListBuffer.empty[Metric]
@@ -36,16 +38,23 @@ abstract class SingleGroup extends Open with Scheduled { self =>
 
     override def notifyOfRemovedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = synchronized {
         self.removeQueue += metric
-        if (logger.isDebugEnabled()) logger.debug(s"DropMetric, Queue +: ${name}")
+        if (logger.isDebugEnabled()) logger.debug(s"DropMetric, Queue to Drop, Name: ${metricName}, Class: ${metric.getClass.getName}")
     }
 
     override def report() : Unit = {
-        reporter.apply(group, System.currentTimeMillis())
+        val startedAt = System.currentTimeMillis()
+
+        reporter.apply(group, startedAt)
+
+        val endedAt = System.currentTimeMillis()
+
+        if (logger.isDebugEnabled()) logger.debug(s"Report, Time: ${startedAt}, Taked Millis: ${endedAt - startedAt}")
+
         if (!removeQueue.isEmpty) synchronized {
             val size = removeQueue.size
             removeQueue.foreach { m => group.dropMetric(m) }
             removeQueue.clear()
-            if (logger.isDebugEnabled()) logger.debug(s"DropMetric, Clear Queue: ${size}")
+            if (logger.isDebugEnabled()) logger.debug(s"Report, Drop Metric, Clear Queue: ${size}")
         }
     }
 }

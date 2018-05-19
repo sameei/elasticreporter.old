@@ -36,6 +36,8 @@ case class Elastic(name: String, host: String) {
 
         val url = s"${host}/${report.index}/doc/${report.doc}"
 
+        if (logger.isTraceEnabled()) logger.trace(s"PUT, URL: ${url}, Req(${report.body.getBytes.size}): ${report.body}")
+
         val http = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
 
         http setUseCaches false

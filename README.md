@@ -117,14 +117,13 @@ metrics.reporter.jvmstat.id-pattern: jvmstat-<source_id>-<millis>
 metrics.reporter.jvmstat.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.jvmstat.zone: UTC
 
-
 metrics.reporter.jvmstat-jm.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.JVMStat$OnlyJobManager
 metrics.reporter.jvmstat-jm.elastic-url: http://localhost:9200
 metrics.reporter.jvmstat-jm.source-id: single-node-jm
 metrics.reporter.jvmstat-jm.index-pattern: jvmstat-jm-<year>-<month>-<day_of_month>
 metrics.reporter.jvmstat-jm.id-pattern: jvmstat-<source_id>-<millis>
 metrics.reporter.jvmstat-jm.datetime-pattern: yyyy-MM-dd HH:mm:ss
-metrics.reporter.jvmstat-jmjobmanager.zone: UTC
+metrics.reporter.jvmstat-jm.zone: UTC
 
 metrics.reporter.jvmstat-tm.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.JVMStat$OnlyTaskManager
 metrics.reporter.jvmstat-tm.elastic-url: http://localhost:9200
