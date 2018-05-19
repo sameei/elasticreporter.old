@@ -5,11 +5,11 @@ import org.apache.flink.metrics._
 
 trait Formatters {
 
-    def formatCounter(key: String, counter: Counter)(implicit underlay: common.Formatter) : underlay.Val = {
+    def formatCounter[F <: common.Formatter](key: String, counter: Counter)(implicit underlay: F) : underlay.Val = {
         underlay.formatLong(key, counter.getCount)
     }
 
-    def formatGauge(key: String, gauge: Gauge[_])(implicit underlay: common.Formatter) : underlay.Val = {
+    def formatGauge[F <: common.Formatter](key: String, gauge: Gauge[_])(implicit underlay: F) : underlay.Val = {
 
         gauge.getValue match {
             case long: java.lang.Long => underlay.formatLong(key, long)
@@ -24,7 +24,7 @@ trait Formatters {
         }
     }
 
-    def formatHistogram(key: String, histogram: Histogram)(implicit underlay: common.Formatter): Seq[underlay.Val] = {
+    def formatHistogram[F <: common.Formatter](key: String, histogram: Histogram)(implicit underlay: F): Seq[underlay.Val] = {
         val stat = histogram.getStatistics
         Seq(
             underlay.formatLong(s"${key}.count", histogram.getCount),
@@ -39,7 +39,7 @@ trait Formatters {
         )
     }
 
-    def formatMeter(key: String, meter: Meter)(implicit underlay: common.Formatter): Seq[underlay.Val] = {
+    def formatMeter[F <: common.Formatter](key: String, meter: Meter)(implicit underlay: F): Seq[underlay.Val] = {
         Seq(
             underlay.formatLong(s"${key}.count", meter.getCount),
             underlay.formatDouble(s"${key}.rate", meter.getRate)

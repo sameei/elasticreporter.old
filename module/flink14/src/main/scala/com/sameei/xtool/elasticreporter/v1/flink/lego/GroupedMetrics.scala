@@ -11,13 +11,13 @@ class GroupedMetrics(
 
     protected val logger = LoggerFactory getLogger id
 
-    protected case class MetricRP(key: String, name: String, metric: Metric, group: MetricGroup) {
+    protected case class MetricRep(key: String, name: String, metric: Metric, group: MetricGroup) {
         val metricId = group.getMetricIdentifier(name)
     }
 
-    protected case class VarRP(name: String, value: String, var count: Int)
+    protected case class VarRep(name: String, value: String, var count: Int)
 
-    protected def empty[T] = collection.mutable.HashMap.empty[T, MetricRP]
+    protected def empty[T] = collection.mutable.HashMap.empty[T, MetricRep]
 
     protected val gauges = empty[Gauge[_]]
     protected val counters = empty[Counter]
@@ -26,14 +26,18 @@ class GroupedMetrics(
 
     protected val byKey = empty[String]
 
-    protected val vars = collection.mutable.HashMap.empty[String, VarRP]
+    protected val vars = collection.mutable.HashMap.empty[String, VarRep]
 
     logger.info(s"Init, Class: ${getClass.getName}")
+
+    def count = byKey.size
+
+    def isEmpty = byKey.isEmpty
 
     protected def addVar(key: String, value: String): Unit = {
         vars.get(key) match {
             case None =>
-                vars.put(key, VarRP(key, value, 0))
+                vars.put(key, VarRep(key, value, 0))
                 if (logger.isDebugEnabled()) logger.debug(s"AddVar, Key: ${key}, Val: ${value}")
             case Some(current) if current.value == value => current.count += 1
             case Some(current) =>
@@ -60,7 +64,7 @@ class GroupedMetrics(
 
             case None =>
 
-                val rp = MetricRP(key, name, metric, group)
+                val rp = MetricRep(key, name, metric, group)
 
                 val hasBeenAdded = metric match {
                     case counter: Counter => counters.put(counter, rp); true

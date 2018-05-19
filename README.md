@@ -107,7 +107,7 @@ metrics.reporter.jobtask.datetime-zone: UTC
 
 ```
 
-metrics.reporters: jvmstat, jvmstat-jm, jvmstat-tm
+metrics.reporters: jvmstat, jvmstat-jm, jvmstat-tm, debug
 
 metrics.reporter.jvmstat.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.JVMStat
 metrics.reporter.jvmstat.elastic-url: http://localhost:9200
@@ -133,5 +133,12 @@ metrics.reporter.jvmstat-tm.id-pattern: jvmstat-<source_id>-<millis>
 metrics.reporter.jvmstat-tm.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.jvmstat-tm.zone: UTC
 
+metrics.reporter.debug.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.Debugger
+metrics.reporter.debug.elastic-url: http://localhost:9200
+metrics.reporter.debug.source-id: single-node
+metrics.reporter.debug.index-pattern: merics-debug-<year>-<month>
+metrics.reporter.debug.id-pattern: jvmstat-<source_id>-<millis>
+metrics.reporter.debug.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.debug.zone: UTC
 
 ```

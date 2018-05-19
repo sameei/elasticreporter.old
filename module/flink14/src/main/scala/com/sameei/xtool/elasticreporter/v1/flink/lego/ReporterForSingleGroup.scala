@@ -3,9 +3,7 @@ package com.sameei.xtool.elasticreporter.v1.flink.lego
 import org.apache.flink.metrics.{Metric, MetricConfig, MetricGroup}
 import org.apache.flink.metrics.reporter.{MetricReporter, Scheduled}
 
-abstract class SingleGroup extends Open with Scheduled { self =>
-
-    override protected def name : String = getClass.getName
+trait ReporterForSingleGroup extends Open with Scheduled { self =>
 
     private var group: GroupedMetrics = null
 
@@ -15,8 +13,6 @@ abstract class SingleGroup extends Open with Scheduled { self =>
         super.open(config)
         self.group = new GroupedMetrics(s"${name}.group.${System.currentTimeMillis()}")
     }
-
-    override def close() : Unit = {}
 
     def select(name: String, metric: Metric, group: MetricGroup): Option[String]
 

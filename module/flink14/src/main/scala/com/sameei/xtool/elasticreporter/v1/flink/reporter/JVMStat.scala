@@ -8,7 +8,7 @@ import com.sameei.xtool.elasticreporter.v1.elastic.Reporter
 import com.sameei.xtool.elasticreporter.v1.flink.{lego, reporter}
 import org.apache.flink.metrics._
 
-class JVMStat extends lego.SingleGroup {
+class JVMStat extends lego.ReporterForSingleGroup {
 
     val keys = Set(
         "Status.JVM.ClassLoader.ClassesLoaded",

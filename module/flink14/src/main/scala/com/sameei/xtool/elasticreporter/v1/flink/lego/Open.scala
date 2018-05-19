@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 trait Open extends MetricReporter { self =>
 
-    protected def name: String
+    protected def name: String = getClass.getName
 
     protected var config: elastic.Reporter.Config = null
 
@@ -35,6 +35,8 @@ trait Open extends MetricReporter { self =>
 
         logger info s"Open, Config: ${self.config}"
     }
+
+    override def close() : Unit = {}
 }
 
 /*
