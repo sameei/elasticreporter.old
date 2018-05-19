@@ -39,7 +39,7 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
             if (g.isEmpty) {
                 dropGroup(gid)
                 if (logger.isDebugEnabled()) logger.debug(s"DropMetric, Remove Empty Group: ${g.id}")
-            }
+            } else logger.debug(s"DropMetric, Group: ${g.count}")
         }
     }
 
@@ -57,7 +57,7 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
 
     override def notifyOfRemovedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = synchronized {
         select(metricName, metric, group).map { ref =>
-            removeQueue :+ MetricData(ref, metricName, metric, group)
+            removeQueue += MetricData(ref, metricName, metric, group)
             if (logger.isDebugEnabled()) logger.debug(s"DropMetric, Queue += ${ref}")
         } getOrElse {
             if (logger.isDebugEnabled()) {
@@ -77,13 +77,18 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
 
         if (logger.isDebugEnabled()) logger.debug(s"Report, Time: ${startedAt}, Taked Millis: ${endedAt - startedAt}, Groups: ${groups.size}")
 
-        if (removeQueue.nonEmpty) synchronized {
+        logger.debug(s"Report, Remove Queue: ${removeQueue.size}")
+        if (!removeQueue.isEmpty) synchronized {
             val size = removeQueue.size
             removeQueue.foreach { data =>
                 dropMetric(data.ref.groupId, data.name, data.value, data.group)
             }
             removeQueue.clear()
             if (logger.isDebugEnabled()) logger.debug(s"Report, Drop Metric, Clear Queue: ${size}")
+
+            if (logger.isDebugEnabled()) groups.foreach { case (k,v) =>
+                    logger.debug(s"Group(${k}), ${v.count}")
+            }
         }
     }
 

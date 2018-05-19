@@ -107,7 +107,7 @@ metrics.reporter.jobtask.datetime-zone: UTC
 
 ```
 
-metrics.reporters: jvmstat, jvmstat-jm, jvmstat-tm, debug
+metrics.reporters: jvmstat, jvmstat-jm, jvmstat-tm, debug, debug-config
 
 metrics.reporter.jvmstat.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.JVMStat
 metrics.reporter.jvmstat.elastic-url: http://localhost:9200
@@ -140,5 +140,24 @@ metrics.reporter.debug.index-pattern: merics-debug-<year>-<month>
 metrics.reporter.debug.id-pattern: jvmstat-<source_id>-<millis>
 metrics.reporter.debug.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.debug.zone: UTC
+
+metrics.reporter.debug-config.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.Debugger$PrintConfig
+metrics.reporter.debug-config.elastic-url: http://localhost:9200
+metrics.reporter.debug-config.source-id: single-node
+metrics.reporter.debug-config.index-pattern: merics-debug-<year>-<month>
+metrics.reporter.debug-config.id-pattern: jvmstat-<source_id>-<millis>
+metrics.reporter.debug-config.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.debug-config.zone: UTC
+
+metrics.reporter.jobtask.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.Job$ByTask
+metrics.reporter.jobtask.elastic-url: http://localhost:9200
+metrics.reporter.jobtask.source-id: single-node
+metrics.reporter.jobtask.index-pattern: <job_name>-<year>-<month>-<day_of_month>
+metrics.reporter.jobtask.id-pattern: <task_id>-<subtask_index>-<source_id>-<millis>
+metrics.reporter.jobtask.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.jobtask.zone: UTC
+
+metrics.scope.task: <host>.taskmanager.<tm_id>.<job_name>.<task_name>.<subtask_index>
+metrics.scope.task: FLINK_TM
 
 ```

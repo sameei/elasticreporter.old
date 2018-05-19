@@ -1,10 +1,14 @@
 package com.sameei.xtool.elasticreporter.v1.flink.reporter
 
+import java.util.function.BiConsumer
+
 import com.sameei.xtool.elasticreporter.v1.flink.lego.Open
 import org.apache.flink.metrics._
 import com.sameei.xtool.elasticreporter.v1.common
 import com.sameei.xtool.elasticreporter.v1.flink.lego
 import com.sameei.xtool.elasticreporter.v1.flink.reporter.Debugger.MetricGM
+import org.apache.flink.metrics.reporter.MetricReporter
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
@@ -78,6 +82,24 @@ object Debugger {
         }
 
         override def vars[C <: common.ReportContext](context : C) : Map[String, String] = Map.empty
+    }
+
+    class PrintConfig extends MetricReporter {
+
+        protected val logger = LoggerFactory.getLogger(getClass)
+
+        override def open(config : MetricConfig) : Unit = {
+            config.forEach(new BiConsumer[Object,Object] {
+                override def accept(k : Object, v : Object) : Unit =
+                    logger.info(s"Open, Key(${k.getClass.getName}): ${k}, Value(${v.getClass.getName}): ${v}")
+            })
+        }
+
+        override def close() : Unit = {}
+
+        override def notifyOfAddedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = {}
+
+        override def notifyOfRemovedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = {}
     }
 
 }
