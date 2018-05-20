@@ -165,6 +165,20 @@ metrics.reporter.jobopt.id-pattern: <operator_id>-<subtask_index>-<source_id>-<m
 metrics.reporter.jobopt.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.jobopt.zone: UTC
 
+
+metrics.reporter.gnl_jobtask_1.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.General
+metrics.reporter.gnl_jobtask_1.elastic-url: http://localhost:9200
+metrics.reporter.gnl_jobtask_1.source-id: single-node
+metrics.reporter.gnl_jobtask_1.index-pattern: gnl-job-task-<job_name>-<year>-<month>-<day_of_month>
+metrics.reporter.gnl_jobtask_1.id-pattern: <task_id>-<subtask_index>-<source_id>-<millis>
+metrics.reporter.gnl_jobtask_1.datetime-pattern: yyyy-MM-dd HH:mm:ss
+metrics.reporter.gnl_jobtask_1.zone: UTC
+metrics.reporter.gnl_jobtask_1.filter-by.scope: <host>.taskmanager.<tm_id>.<job_name>.<task_name>.<subtask_index>
+metrics.reporter.gnl_jobtask_1.group-by: <job_name>-<task_id>-<subtask_index>
+metrics.reporter.gnl_jobtask_1.name-by.scope-drop-left: 6
+
+
+
 metrics.scope.task: <host>.taskmanager.<tm_id>.<job_name>.<task_name>.<subtask_index>
 metrics.scope.task: FLINK_TM
 
