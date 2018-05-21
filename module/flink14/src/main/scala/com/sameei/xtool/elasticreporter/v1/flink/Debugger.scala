@@ -1,15 +1,13 @@
-package com.sameei.xtool.elasticreporter.v1.flink.reporter
+package com.sameei.xtool.elasticreporter.v1.flink
 
 import java.util.function.BiConsumer
 
+import com.sameei.xtool.elasticreporter.v1.common
 import com.sameei.xtool.elasticreporter.v1.flink.lego.Open
 import org.apache.flink.metrics._
-import com.sameei.xtool.elasticreporter.v1.common
-import com.sameei.xtool.elasticreporter.v1.flink.lego
-import com.sameei.xtool.elasticreporter.v1.flink.reporter.Debugger.MetricGM
 import org.apache.flink.metrics.reporter.MetricReporter
 import org.slf4j.LoggerFactory
-
+import Debugger._
 import scala.collection.JavaConverters._
 
 class Debugger extends Open {

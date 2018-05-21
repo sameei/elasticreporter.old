@@ -1,7 +1,7 @@
 package com.sameei.xtool.elasticreporter.v1.flink.lego
 
 import com.sameei.xtool.elasticreporter.v1.flink.lego
-import com.sameei.xtool.elasticreporter.v1.flink.lego.ReporterForMultipleGroups.Ref
+import data._
 import org.apache.flink.metrics.{Metric, MetricGroup}
 
 import scala.collection.JavaConverters._
@@ -10,15 +10,15 @@ trait ReporterForJob extends lego.ReporterForMultipleGroups {
 
     protected def keys: Array[String]
 
-    protected def toGroupId(name : String, metric : Metric, group : MetricGroup): String
+    protected def toGroupId(ref: MetricRef): String
 
-    protected def toMetricName(name : String, metric : Metric, group : MetricGroup): String
+    protected def toMetricName(ref: MetricRef): String
 
     override protected def select(
-        name : String, metric : Metric, group : MetricGroup
-    ) : Option[ReporterForMultipleGroups.Ref] = {
+        ref: MetricRef
+    ) : Option[Selected] = {
 
-        val vars = group.getAllVariables.asScala
+        val vars = ref.group.getAllVariables.asScala
 
         if (vars.size < keys.size) None
         else {
@@ -30,9 +30,9 @@ trait ReporterForJob extends lego.ReporterForMultipleGroups {
 
             if (count < keys.size) None
             else {
-                Some(Ref(
-                    toGroupId(name, metric, group),
-                    toMetricName(name, metric, group)
+                Some(Selected(
+                    toGroupId(ref),
+                    toMetricName(ref)
                 ))
             }
         }

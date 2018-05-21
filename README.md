@@ -133,7 +133,7 @@ metrics.reporter.jvmstat-tm.id-pattern: jvmstat-<source_id>-<millis>
 metrics.reporter.jvmstat-tm.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.jvmstat-tm.zone: UTC
 
-metrics.reporter.debug.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.Debugger
+metrics.reporter.debug.class: com.sameei.xtool.elasticreporter.v1.flink.Debugger
 metrics.reporter.debug.elastic-url: http://localhost:9200
 metrics.reporter.debug.source-id: single-node
 metrics.reporter.debug.index-pattern: merics-debug-<year>-<month>
@@ -141,7 +141,7 @@ metrics.reporter.debug.id-pattern: jvmstat-<source_id>-<millis>
 metrics.reporter.debug.datetime-pattern: yyyy-MM-dd HH:mm:ss
 metrics.reporter.debug.zone: UTC
 
-metrics.reporter.debug-config.class: com.sameei.xtool.elasticreporter.v1.flink.reporter.Debugger$PrintConfig
+metrics.reporter.debug-config.class: com.sameei.xtool.elasticreporter.v1.flink.Debugger$PrintConfig
 metrics.reporter.debug-config.elastic-url: http://localhost:9200
 metrics.reporter.debug-config.source-id: single-node
 metrics.reporter.debug-config.index-pattern: merics-debug-<year>-<month>

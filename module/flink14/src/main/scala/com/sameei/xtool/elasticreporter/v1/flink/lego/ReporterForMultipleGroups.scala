@@ -1,6 +1,6 @@
 package com.sameei.xtool.elasticreporter.v1.flink.lego
 
-import com.sameei.xtool.elasticreporter.v1.flink.lego.ReporterForMultipleGroups.{MetricData, Ref}
+import data._
 import org.apache.flink.metrics.{Metric, MetricGroup}
 import org.apache.flink.metrics.reporter.Scheduled
 
@@ -10,7 +10,7 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
 
     protected val groups = mutable.HashMap.empty[String, GroupedMetrics]
 
-    protected val removeQueue = collection.mutable.ListBuffer.empty[MetricData]
+    protected val removeQueue = collection.mutable.ListBuffer.empty[MetricRefPlus]
 
     protected def ifGroup(id: String) = groups.get(id)
 
@@ -44,7 +44,10 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
     }
 
     override def notifyOfAddedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = synchronized {
-        select(metricName, metric, group) map { ref =>
+
+        val ref = MetricRef(metricName, metric, group)
+
+        select(ref) map { ref =>
             addMetric(ref.groupId, ref.metricKey, metricName, metric, group)
             if (logger.isDebugEnabled()) logger.debug(s"AddMetric, New, Ref: ${ref}")
         } getOrElse {
@@ -56,8 +59,11 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
     }
 
     override def notifyOfRemovedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = synchronized {
-        select(metricName, metric, group).map { ref =>
-            removeQueue += MetricData(ref, metricName, metric, group)
+
+        val ref = MetricRef(metricName, metric, group)
+
+        select(ref).map { ref =>
+            removeQueue += MetricRefPlus(ref, metricName, metric, group)
             if (logger.isDebugEnabled()) logger.debug(s"DropMetric, Queue += ${ref}")
         } getOrElse {
             if (logger.isDebugEnabled()) {
@@ -92,14 +98,5 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
         }
     }
 
-    protected def select(name: String, metric: Metric, group: MetricGroup): Option[Ref]
-}
-
-
-object ReporterForMultipleGroups {
-
-    case class Ref(groupId: String, metricKey: String)
-
-    case class MetricData(ref: Ref, name: String, value: Metric, group: MetricGroup)
-
+    protected def select(ref: MetricRef): Option[Selected]
 }

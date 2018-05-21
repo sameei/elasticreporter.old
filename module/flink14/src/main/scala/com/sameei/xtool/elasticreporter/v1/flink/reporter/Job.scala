@@ -1,7 +1,9 @@
 package com.sameei.xtool.elasticreporter.v1.flink.reporter
 
 import com.sameei.xtool.elasticreporter.v1.flink.lego.ReporterForJob
+import com.sameei.xtool.elasticreporter.v1.flink.lego.data.MetricRef
 import org.apache.flink.metrics.{Metric, MetricGroup}
+
 import scala.collection.JavaConverters._
 
 object Job {
@@ -21,22 +23,22 @@ object Job {
 
         protected override val keys = Array(JobName, JobName, TaskName, TaskId, SubtaskIndex)
 
-        override protected def toGroupId(name : String, metric : Metric, group : MetricGroup) : String = {
-            val vars = group.getAllVariables.asScala
+        override protected def toGroupId(ref: MetricRef) : String = {
+            val vars = ref.group.getAllVariables.asScala
             s"${vars(JobName)}.${vars(TaskId)}.${vars(SubtaskIndex)}"
         }
 
-        override protected def toMetricName(name : String, metric : Metric, group : MetricGroup) : String = {
+        override protected def toMetricName(ref: MetricRef) : String = {
 
             val limit = 6
 
-            val scopes = group.getScopeComponents
+            val scopes = ref.group.getScopeComponents
 
             if (scopes.size < limit) {
                 logger.warn(
                     s"""
                          |MetricName,
-                         |Invalid Scope: [${group.getScopeComponents.mkString(",")}],
+                         |Invalid Scope: [${ref.group.getScopeComponents.mkString(",")}],
                          |Less than ${limit},
                          |Return Name as MetricName: ${name},
                          |Desc: It seems that you have change the defualt value of 'metrics.scope.task';
@@ -69,16 +71,16 @@ object Job {
 
         protected override val keys = Array(JobName, JobName, OperatorName, OperatorId, SubtaskIndex)
 
-        override protected def toGroupId(name : String, metric : Metric, group : MetricGroup) : String = {
-            val vars = group.getAllVariables.asScala
+        override protected def toGroupId(ref: MetricRef) : String = {
+            val vars = ref.group.getAllVariables.asScala
             s"${vars(JobName)}.${vars(OperatorId)}.${vars(SubtaskIndex)}"
         }
 
-        override protected def toMetricName(name : String, metric : Metric, group : MetricGroup) : String = {
+        override protected def toMetricName(ref: MetricRef) : String = {
 
             val limit = 6
 
-            val scopes = group.getScopeComponents
+            val scopes = ref.group.getScopeComponents
 
             if (scopes.size < limit) {
                 logger.warn(
