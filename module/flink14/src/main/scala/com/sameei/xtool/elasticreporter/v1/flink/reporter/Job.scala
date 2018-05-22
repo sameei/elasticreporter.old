@@ -1,7 +1,7 @@
 package com.sameei.xtool.elasticreporter.v1.flink.reporter
 
 import com.sameei.xtool.elasticreporter.v1.flink.lego.ReporterForJob
-import com.sameei.xtool.elasticreporter.v1.flink.lego.data.MetricRef
+import com.sameei.xtool.elasticreporter.v1.flink.lego.data.FlinkMetricRef
 import org.apache.flink.metrics.{Metric, MetricGroup}
 
 import scala.collection.JavaConverters._
@@ -23,12 +23,12 @@ object Job {
 
         protected override val keys = Array(JobName, JobName, TaskName, TaskId, SubtaskIndex)
 
-        override protected def toGroupId(ref: MetricRef) : String = {
+        override protected def toGroupId(ref: FlinkMetricRef) : String = {
             val vars = ref.group.getAllVariables.asScala
             s"${vars(JobName)}.${vars(TaskId)}.${vars(SubtaskIndex)}"
         }
 
-        override protected def toMetricName(ref: MetricRef) : String = {
+        override protected def toMetricName(ref: FlinkMetricRef) : String = {
 
             val limit = 6
 
@@ -71,12 +71,12 @@ object Job {
 
         protected override val keys = Array(JobName, JobName, OperatorName, OperatorId, SubtaskIndex)
 
-        override protected def toGroupId(ref: MetricRef) : String = {
+        override protected def toGroupId(ref: FlinkMetricRef) : String = {
             val vars = ref.group.getAllVariables.asScala
             s"${vars(JobName)}.${vars(OperatorId)}.${vars(SubtaskIndex)}"
         }
 
-        override protected def toMetricName(ref: MetricRef) : String = {
+        override protected def toMetricName(ref: FlinkMetricRef) : String = {
 
             val limit = 6
 

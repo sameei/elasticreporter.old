@@ -45,7 +45,7 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
 
     override def notifyOfAddedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = synchronized {
 
-        val ref = MetricRef(metricName, metric, group)
+        val ref = FlinkMetricRef(metricName, metric, group)
 
         select(ref) map { ref =>
             addMetric(ref.groupId, ref.metricKey, metricName, metric, group)
@@ -60,7 +60,7 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
 
     override def notifyOfRemovedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = synchronized {
 
-        val ref = MetricRef(metricName, metric, group)
+        val ref = FlinkMetricRef(metricName, metric, group)
 
         select(ref).map { ref =>
             removeQueue += MetricRefPlus(ref, metricName, metric, group)
@@ -98,5 +98,5 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
         }
     }
 
-    protected def select(ref: MetricRef): Option[Selected]
+    protected def select(ref: FlinkMetricRef): Option[Selected]
 }

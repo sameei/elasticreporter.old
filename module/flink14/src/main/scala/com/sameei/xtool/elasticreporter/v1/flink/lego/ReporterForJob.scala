@@ -10,12 +10,12 @@ trait ReporterForJob extends lego.ReporterForMultipleGroups {
 
     protected def keys: Array[String]
 
-    protected def toGroupId(ref: MetricRef): String
+    protected def toGroupId(ref: FlinkMetricRef): String
 
-    protected def toMetricName(ref: MetricRef): String
+    protected def toMetricName(ref: FlinkMetricRef): String
 
     override protected def select(
-        ref: MetricRef
+        ref: FlinkMetricRef
     ) : Option[Selected] = {
 
         val vars = ref.group.getAllVariables.asScala

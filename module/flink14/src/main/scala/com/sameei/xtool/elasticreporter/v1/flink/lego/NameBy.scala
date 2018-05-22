@@ -1,20 +1,20 @@
 package com.sameei.xtool.elasticreporter.v1.flink.lego
 
-import com.sameei.xtool.elasticreporter.v1.flink.lego.data.MetricRef
+import com.sameei.xtool.elasticreporter.v1.flink.lego.data.FlinkMetricRef
 import org.apache.flink.metrics.MetricConfig
 
-trait NameBy { def nemeOf(ref: MetricRef): String }
+trait NameBy { def nemeOf(ref: FlinkMetricRef): String }
 
 object NameBy {
 
     class Origin extends NameBy {
-        override def nemeOf(ref : MetricRef) : String = ref.group.getMetricIdentifier(ref.name)
+        override def nemeOf(ref : FlinkMetricRef) : String = ref.group.getMetricIdentifier(ref.name)
 
         override def toString : String = getClass.getName
     }
 
     case class ScopeDropLeft(limit: Int) extends NameBy {
-        override def nemeOf(ref : MetricRef) : String = {
+        override def nemeOf(ref : FlinkMetricRef) : String = {
             val all = ref.group.getScopeComponents
             if (all.size < limit) ref.name // warning
             else if (all.size == limit) return ref.name

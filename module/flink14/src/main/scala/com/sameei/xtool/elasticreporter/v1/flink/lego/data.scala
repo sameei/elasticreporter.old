@@ -1,6 +1,7 @@
 package com.sameei.xtool.elasticreporter.v1.flink.lego
 
 import org.apache.flink.metrics.{Metric, MetricGroup}
+import scala.collection.JavaConverters._
 
 object data {
 
@@ -17,8 +18,25 @@ object data {
     ) extends RuntimeException(desc, cause.orNull)
 
 
-    case class MetricRef(name: String, metric: Metric, group: MetricGroup) {
-        def desc: String = s"Name: ${name}, Metric: ${metric.getClass.getName}, ID: ${group.getMetricIdentifier(name)}"
+    trait MetricRef {
+        def name: String
+        def id: String
+        def vars: Map[String, String]
+        def scope: Seq[String]
+        def desc: String
+    }
+
+    case class FlinkMetricRef(name: String, metric: Metric, group: MetricGroup) extends MetricRef {
+        lazy val id: String = group.getMetricIdentifier(name)
+        lazy val vars: Map[String, String] = group.getAllVariables.asScala.toMap
+        lazy val scope: Seq[String] = group.getScopeComponents.toList
+        def desc: String = s"Metric: ${metric.getClass.getName}, Name: ${name}, Id: ${id}, Vars: ${vars}, Scope: ${scope}"
+    }
+
+    case class FakeMetricRef(
+        name: String, id: String, vars: Map[String, String], scope: Seq[String]
+    ) extends MetricRef {
+        def desc: String = s"Fake, Name: ${name}, Id: ${id}, Vars: ${vars}, Scope: ${scope}"
     }
 
     case class Selected(groupId: String, metricKey: String)

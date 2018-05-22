@@ -8,7 +8,7 @@ class Reporter extends Open with ReporterForMultipleGroups {
 
     protected var groupBy : GroupBy = null
 
-    protected var filterBy : FilterBy = null
+    protected var filters : Seq[FilterBy] = null
 
     protected var nameBy : NameBy = null
 
@@ -16,28 +16,31 @@ class Reporter extends Open with ReporterForMultipleGroups {
 
         super.open(config)
 
-        groupBy = GroupBy(config)
+        filters = FilterBy(config)
 
-        filterBy = FilterBy(config)
+        groupBy = GroupBy(config)
 
         nameBy = NameBy(config)
 
-        logger.info(s"Open, GroupBy: ${groupBy}, FilterBy: ${filterBy}, NameBy: ${nameBy}")
+        logger.info(s"Open, FilterBy: ${filters}, GroupBy: ${groupBy}, NameBy: ${nameBy}")
     }
 
-    override protected def select(ref: MetricRef) : Option[Selected] = {
+    override protected def select(ref: FlinkMetricRef) : Option[Selected] = {
 
-        if (!filterBy.filter(ref)) {
-            logger.info(s"Filter, ${ref.desc}")
-            None
-        } else {
+        FilterBy(filters, ref) match {
 
-            val groupId = groupBy.groupOf(ref)
-            val metricKey = nameBy.nemeOf(ref)
+            case Some(filter) =>
+                logger.info(s"Filter, ${filter}, ${ref.desc}")
+                None
 
-            logger.info(s"Select, GroupID: ${groupId}, MetricKey: ${metricKey}, ${ref}")
+            case None =>
 
-            Some(Selected(groupId, metricKey))
+                val groupId = groupBy.groupOf(ref)
+                val metricKey = nameBy.nemeOf(ref)
+
+                logger.info(s"Select, GroupID: ${groupId}, MetricKey: ${metricKey}, ${ref.desc}")
+
+                Some(Selected(groupId, metricKey))
         }
     }
 }
