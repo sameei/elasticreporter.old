@@ -48,7 +48,10 @@ lazy val flink14 = flink("flink14", "1.4.2").dependsOn(cmn)
 
 lazy val examplejob = {
 
-    val flinkDependencies = Seq("flink-scala", "flink-streaming-scala") map { m =>
+    val flinkDependencies = Seq(
+        "flink-scala",
+        "flink-streaming-scala"
+    ) map { m =>
         "org.apache.flink" %% m % "1.4.2" % Provided
     }
 
@@ -56,6 +59,8 @@ lazy val examplejob = {
         .settings(
             assembly / mainClass := Some("org.example.Job"),
             libraryDependencies ++= flinkDependencies,
+            // libraryDependencies += "org.apache.flink" % "flink-mterics-dropwizard" % "1.4.2",
+            libraryDependencies += "org.apache.flink" % "flink-metrics-dropwizard" % "1.4.2" % Provided,
             Compile / run := Defaults.runTask(Compile / fullClasspath,
                 Compile / run / mainClass,
                 Compile / run / runner

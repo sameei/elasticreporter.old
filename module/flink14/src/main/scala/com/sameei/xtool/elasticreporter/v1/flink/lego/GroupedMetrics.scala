@@ -136,7 +136,7 @@ class GroupedMetrics(
         list ++= gauges.map { case(m,v) =>
             if (logger.isTraceEnabled()) logger.trace(s"Metric, Guage, Key: ${v.key}, Name: ${v.name}, ID: ${v.metricId}")
             formatGauge(v.key, m)(context.formatter)
-        }
+        }.flatMap { i => i }
 
         list ++= histograms.map { case (m,v) =>
             if (logger.isTraceEnabled()) logger.trace(s"Metric, Histogram, Key: ${v.key}, Name: ${v.name}, ID: ${v.metricId}")

@@ -37,6 +37,8 @@ object Debugger {
         group: MetricGroup
     ) extends common.GroupedMetrics with lego.Formatters {
 
+        protected val logger = LoggerFactory getLogger s"${getClass.getName}.${id}"
+
         /*protected def formatMetric[F <: common.Formatter](
             name: String, metric: Metric, group: MetricGroup
         )(implicit formatter: F): Seq[formatter.Val] = {
