@@ -20,12 +20,13 @@ def define(moduleName : String, artifact : String, dirName : String) = {
         ).settings(common : _*)
 }
 
-def flink(moduleName : String, flinkVersion : String) = {
+def flink(moduleName : String, flinkVersion : String, v: String) = {
     define(
         moduleName,
-        s"elastic-reporter-flink-${flinkVersion}",
+        s"elasticreporter-flink${flinkVersion}",
         moduleName
     ).settings(
+        version := v,
         libraryDependencies += "org.apache.flink" % "flink-metrics-core" % flinkVersion % Provided,
         libraryDependencies += "org.apache.flink" % "flink-core" % flinkVersion % Provided,
         libraryDependencies += "org.apache.flink" %% "flink-runtime" % flinkVersion % Provided,
@@ -44,7 +45,13 @@ lazy val cmn = define(
     libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided
 )
 
-lazy val flink14 = flink("flink14", "1.4.2").dependsOn(cmn)
+lazy val flink14 = flink("flink14", "1.4.2", "0.1").dependsOn(cmn)
+
+lazy val flink12 = flink("flink12", "1.2.1", "0.1")
+    .dependsOn(cmn)
+    .settings(
+        sourceDirectory := (sourceDirectory in flink14).value,
+    )
 
 lazy val examplejob = {
 
