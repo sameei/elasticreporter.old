@@ -39,7 +39,7 @@ def flink(moduleName : String, flinkVersion : String, v: String) = {
 
 lazy val cmn = define(
     "common",
-    "elastic-reporter-common",
+    "elasticreporter-common",
     "common"
 ).settings(
     libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided
@@ -80,35 +80,3 @@ lazy val examplejob = {
 
 lazy val root = (project in file(".")).aggregate(cmn, flink14, examplejob)
 
-// ============================================================
-
-/*
-lazy val xjava = define("xjava", "xjava", "xjava")
-
-lazy val base = define(
-    "base",
-    "elasticsearch-metric-reporter-base",
-    "base"
-).settings(
-    libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided
-).dependsOn(xjava)
-
-lazy val flink14 = flink("flink14", "1.4.2")
-
-lazy val flink12 = flink("flink12", "1.2.1")
-    .settings(
-        sourceDirectory := (sourceDirectory in flink14).value,
-    )
-
-lazy val newgen = define(
-    "newgen",
-    "esreporter-common",
-    "newgen"
-).settings(
-    libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided
-).dependsOn(xjava)
-
-lazy val newgenflink14 = flink("ngflink", "1.4.2").dependsOn(newgen)
-*/
-
-// ============================================================
