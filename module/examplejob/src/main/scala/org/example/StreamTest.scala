@@ -3,6 +3,8 @@ package org.example
 import java.util.concurrent.atomic.AtomicBoolean
 
 import org.apache.flink.api.common.functions.RichMapFunction
+import org.apache.flink.client.program.{ClusterClient, JobWithJars}
+import org.apache.flink.client.program.rest.RestClusterClient
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.dropwizard.metrics.DropwizardMeterWrapper
 import org.apache.flink.metrics.{Meter, MetricGroup}
@@ -79,8 +81,18 @@ object StreamTest {
         }
     }
 
+    def job(env: StreamExecutionEnvironment, name: String) = {
+        val in = env.addSource(FakeSource(100) { now => util.Random.nextInt(100) })
 
-    def main(args: Array[String]): Unit = {
+        in.map(new SimpleMap).addSink(new SinkFunction[Int] {
+            override def invoke(value : Int) : Unit = println(value)
+        })
+
+        env.execute(name)
+    }
+
+
+    def submit(args: Array[String]): Unit = {
 
         if (args.length != 1) {
             System.err.println("USAGE: \n <job_name>")
@@ -91,13 +103,32 @@ object StreamTest {
 
         val env = StreamExecutionEnvironment.getExecutionEnvironment
 
-        val in = env.addSource(FakeSource(100) { now => util.Random.nextInt(100) })
-
-        in.map(new SimpleMap).addSink(new SinkFunction[Int] {
-            override def invoke(value : Int) : Unit = println(value)
-        })
-
-        env.execute(name)
+        job(env, name)
     }
+
+    def remote(args: Array[String]): Unit = {
+
+        if (args.length != 3) {
+            System.err.println("USAGE: \n <job_name> <host> <port>")
+            return
+        }
+
+        val name = args(0)
+        val host = args(1)
+        val port = args(2).toInt
+
+        val jar = {
+            "/mnt/mine/work/elasticreporter/module/examplejob/target/scala-2.11/examplejob-assembly-0.1.0-SNAPSHOT.jar"
+            "target/scala-2.11/examplejob-assembly-0.1.0-SNAPSHOT.jar"
+        }
+
+        println(name, host, port)
+
+        val env = StreamExecutionEnvironment.createRemoteEnvironment(host, port, jar)
+
+        job(env, name)
+    }
+
+    def main(args: Array[String]): Unit  = submit(args)
 
 }

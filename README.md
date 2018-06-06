@@ -1,6 +1,6 @@
 
 
-flink-conf.yaml
+#### For Flink @ flink-conf.yaml
 
 ```
 
@@ -84,5 +84,20 @@ metrics.reporter.joboperator.group-by: <job_name>-<operator_id>-<subtask_index>
 metrics.reporter.joboperator.name-by.scope-drop-left: 6
 
 ```
+
+### For Kamon @ application.conf
+
+```
+custom-path = {
+  name = "kamon.elastic-reporter"
+  source-id = "SimpleAkkaApp"
+  elastic-url = "http://localhost:9200"
+  index-pattern = "<source_id>-<year>-<month>-<day_of_month>"
+  id-pattern = "<source_id>-<millis>"
+  datetime-pattern = "yyyy-MM-dd HH:mm:ss"
+  datetime-zone = "UTC"
+}
+```
+
 
 ![Just an snapshot from my work!](doc/image.png)
