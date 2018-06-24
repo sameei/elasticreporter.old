@@ -119,4 +119,22 @@ class FormatterV1Suite extends FlatSpec with Matchers {
         parsed.isRight shouldBe true
     }
 
+    it must "format INIFINITY values as 0" in {
+
+        val json = formatter.format(
+            formatter.formatDouble("double_positive_inf", java.lang.Double.POSITIVE_INFINITY) ::
+            formatter.formatDouble("double_negetive_inf", java.lang.Double.NEGATIVE_INFINITY) ::
+            formatter.formatFloat("float_positive_inf", java.lang.Float.POSITIVE_INFINITY) ::
+            formatter.formatFloat("float_negative_inf", java.lang.Float.NEGATIVE_INFINITY) :: Nil
+        )
+
+        val parsed = parse(json)
+
+        info(parsed.toString.replace("\n", ""))
+
+        parsed.isRight shouldBe true
+
+    }
+
+
 }

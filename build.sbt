@@ -46,12 +46,12 @@ lazy val cmn = define(
     "common"
 ).settings(
     libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided,
-    version := "0.1"
+    version := "0.2"
 )
 
-lazy val flink14 = flink("flink14", "1.4.2", "0.1").dependsOn(cmn)
+lazy val flink14 = flink("flink14", "1.4.2", "0.2").dependsOn(cmn)
 
-lazy val flink12 = flink("flink12", "1.2.1", "0.1")
+lazy val flink12 = flink("flink12", "1.2.1", "0.2")
     .dependsOn(cmn)
     .settings(
         sourceDirectory := (sourceDirectory in flink14).value,
@@ -60,7 +60,7 @@ lazy val flink12 = flink("flink12", "1.2.1", "0.1")
 lazy val kamon = define("kamon", "elasticreporter-kamon", "kamon")
     .settings(
         libraryDependencies += "io.kamon" %% "kamon-core" % "1.1.0" % Provided,
-        version := "0.1"
+        version := "0.2"
     ).dependsOn(cmn)
 
 lazy val examplejob = {

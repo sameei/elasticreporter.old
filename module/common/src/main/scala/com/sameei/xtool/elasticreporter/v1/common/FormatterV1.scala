@@ -69,13 +69,31 @@ class FormatterV1 extends Formatter {
     }
 
     override def formatFloat(rawKey : String, rawVal : Float) : Val = {
-        val value = rawVal.toString
+
+        // @todo Log Infinity occurences! or change function to return Option[Val]
+
+        val rValue = rawVal match {
+            case java.lang.Double.POSITIVE_INFINITY => 0
+            case java.lang.Double.NEGATIVE_INFINITY => 0
+            case other => other
+        }
+
+        val value = rValue.toString
         checkInvalidKey(rawKey, value)
         simple(rawKey, value)
     }
 
     override def formatDouble(rawKey : String, rawVal : Double) : Val = {
-        val value = rawVal.toString
+
+        // @todo Log Infinity occurences! or change function to return Option[Val]
+
+        val rValue = rawVal match {
+            case java.lang.Double.POSITIVE_INFINITY => 0
+            case java.lang.Double.NEGATIVE_INFINITY => 0
+            case other => other
+        }
+
+        val value = rValue.toString
         checkInvalidKey(rawKey, value)
         simple(rawKey, value)
     }
