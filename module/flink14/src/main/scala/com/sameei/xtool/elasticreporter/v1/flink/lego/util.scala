@@ -1,8 +1,14 @@
 package com.sameei.xtool.elasticreporter.v1.flink.lego
 
 import org.apache.flink.metrics.MetricConfig
+import org.slf4j.LoggerFactory
 
 object util {
+
+    trait WithLogger {
+        protected def name: String
+        val logger = LoggerFactory.getLogger(name)
+    }
 
     implicit class MetricConfigOps(val underlay: MetricConfig) extends AnyVal {
         def getNonEmptyString(key: String) =

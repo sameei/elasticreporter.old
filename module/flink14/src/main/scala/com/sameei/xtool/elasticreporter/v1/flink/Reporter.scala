@@ -16,11 +16,11 @@ class Reporter extends Open with ReporterForMultipleGroups {
 
         super.open(config)
 
-        filters = FilterBy(config)
+        filters = FilterBy(name, config)
 
-        groupBy = GroupBy(config)
+        groupBy = GroupBy(name, config)
 
-        nameBy = NameBy(config)
+        nameBy = NameBy(name, config)
 
         logger.info(s"Open, FilterBy: ${filters}, GroupBy: ${groupBy}, NameBy: ${nameBy}")
     }
@@ -30,15 +30,15 @@ class Reporter extends Open with ReporterForMultipleGroups {
         FilterBy(filters, ref) match {
 
             case Some(filter) =>
-                logger.info(s"Filter, ${filter}, ${ref.desc}")
+                logger.debug(s"Filter, ${filter}, ${ref.desc}")
                 None
 
             case None =>
 
                 val groupId = groupBy.groupOf(ref)
-                val metricKey = nameBy.nemeOf(ref)
+                val metricKey = nameBy.nameOf(ref)
 
-                logger.info(s"Select, GroupID: ${groupId}, MetricKey: ${metricKey}, ${ref.desc}")
+                logger.debug(s"Select, ${filters}, GroupID: ${groupId}, MetricKey: ${metricKey}, ${ref.desc}")
 
                 Some(Selected(groupId, metricKey))
         }

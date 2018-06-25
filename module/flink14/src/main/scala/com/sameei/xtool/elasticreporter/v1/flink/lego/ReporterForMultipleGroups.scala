@@ -43,13 +43,21 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
         }
     }
 
+    def isValid(ref: Selected) = {
+        !ref.groupId.isEmpty && !ref.metricKey.isEmpty
+    }
+
     override def notifyOfAddedMetric(metric : Metric, metricName : String, group : MetricGroup) : Unit = synchronized {
 
         val ref = FlinkMetricRef(metricName, metric, group)
 
-        select(ref) map { ref =>
-            addMetric(ref.groupId, ref.metricKey, metricName, metric, group)
-            if (logger.isDebugEnabled()) logger.debug(s"AddMetric, New, Ref: ${ref}")
+        select(ref) map { id =>
+
+            if (isValid(id)) {
+                addMetric(id.groupId, id.metricKey, metricName, metric, group)
+                if (logger.isDebugEnabled()) logger.debug(s"AddMetric, NEW, Ref: ${id}")
+            } else logger.warn(s"AddMetric, INVALID, Ref: ${id}, ${ref.desc}")
+
         } getOrElse {
             if (logger.isDebugEnabled()) {
                 val id = group.getMetricIdentifier(metricName)
@@ -64,7 +72,7 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
 
         select(ref).map { ref =>
             removeQueue += MetricRefPlus(ref, metricName, metric, group)
-            if (logger.isDebugEnabled()) logger.debug(s"DropMetric, Queue += ${ref}")
+            if (logger.isDebugEnabled()) logger.debug(s"DropMetric, QUEUE += ${ref}")
         } getOrElse {
             if (logger.isDebugEnabled()) {
                 val id = group.getMetricIdentifier(metricName)

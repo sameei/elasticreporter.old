@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
 
 class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextFactory){
 
-    private val logger = LoggerFactory.getLogger(s"${name}")
+    private val logger = LoggerFactory.getLogger(name)
 
     logger.debug(s"Init ..., Class: ${getClass.getName}")
 

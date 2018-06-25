@@ -18,16 +18,16 @@ class FilterBySuite extends FlatSpec with Matchers {
     Vars: Map(<host> -> localhost, <tm_id> -> ca75e2f0b9f4bfee9b08f2fc6f4fe3b7)
     */
 
-    "Scope" must "accept" in {
+    "MatchScope" must "accept" in {
 
-        FilterBy.Scope("<host>.taskmanager").drop(FakeMetricRef(
+        FilterBy.MatchScope("?","<host>.taskmanager").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
             List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
         )) shouldEqual false
 
-        FilterBy.Scope("<host>.taskmanager.<tm_id>").drop(FakeMetricRef(
+        FilterBy.MatchScope("?","<host>.taskmanager.<tm_id>").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
@@ -38,7 +38,7 @@ class FilterBySuite extends FlatSpec with Matchers {
 
     "Scope" must "drop" in {
 
-        FilterBy.Scope("<host>.taskmanager.<tm_id>.something").drop(FakeMetricRef(
+        FilterBy.MatchScope("?","<host>.taskmanager.<tm_id>.something").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
@@ -46,20 +46,9 @@ class FilterBySuite extends FlatSpec with Matchers {
         )) shouldEqual true
     }
 
-    "RejectingVars" must "drop" in {
+    "RejectVars" must "accept" in {
 
-        FilterBy.RejectingVariables("<tm_id>").drop(FakeMetricRef(
-            "AvailableMemorySegments",
-            "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
-            Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
-            List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
-        )) shouldEqual true
-
-    }
-
-    "RejectingVars" must "accept" in {
-
-        FilterBy.RejectingVariables("<job_name>").drop(FakeMetricRef(
+        FilterBy.RejectVars("?","<job_name>").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
@@ -68,39 +57,39 @@ class FilterBySuite extends FlatSpec with Matchers {
 
     }
 
-    "RequiredVariables" must "drop" in {
+    "RejectVars" must "drop" in {
 
-        FilterBy.RequiredVariables("<job_name>.<tm_id>").drop(FakeMetricRef(
+        FilterBy.RejectVars("?","<job_name>.<tm_id>").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
             List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
         )) shouldEqual true
 
-        FilterBy.RequiredVariables("<job_name>").drop(FakeMetricRef(
+        FilterBy.RejectVars("?","<job_name>").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
             List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
-        )) shouldEqual true
+        )) shouldEqual false
 
     }
 
-    "RequiredVariables" must "accept" in {
+    "ForceVars" must "accept" in {
 
-        FilterBy.RequiredVariables("<host>.<tm_id>").drop(FakeMetricRef(
+        FilterBy.ForceVars("?","<host>.<tm_id>").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
             List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
         )) shouldEqual false
 
-        FilterBy.RequiredVariables("<tm_id>").drop(FakeMetricRef(
+        FilterBy.ForceVars("?","<host>.<tm_id>").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
-            Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
+            Map("<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
             List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
-        )) shouldEqual false
+        )) shouldEqual true
 
     }
 
@@ -114,9 +103,9 @@ class FilterBySuite extends FlatSpec with Matchers {
         )
 
 
-        val filters = FilterBy.RequiredVariables("<tm_id>") ::
-            FilterBy.RejectingVariables("<job_name>") ::
-            FilterBy.Scope("<host>.taskmanager.<tm_id>") :: Nil
+        val filters = FilterBy.ForceVars("?","<tm_id>") ::
+            FilterBy.RejectVars("?","<job_name>") ::
+            FilterBy.MatchScope("?","<host>.taskmanager.<tm_id>") :: Nil
 
         FilterBy(filters, FakeMetricRef(
             "AvailableMemorySegments",
@@ -134,7 +123,7 @@ class FilterBySuite extends FlatSpec with Matchers {
             ))
 
             filter.isDefined shouldEqual true
-            filter.get shouldBe a[FilterBy.RejectingVariables]
+            filter.get shouldBe a[FilterBy.RejectVars]
         }
     }
 
@@ -174,15 +163,15 @@ class FilterBySuite extends FlatSpec with Matchers {
         )
 
         val filters = Seq(
-            FilterBy.RejectingVariables("<job_name>"),
-            FilterBy.Scope("<host>.jobmanager")
+            FilterBy.RejectVars("?","<job_name>"),
+            FilterBy.MatchScope("?","<host>.jobmanager")
         )
 
 
         val rsl = FilterBy(filters, fake)
 
         rsl.isDefined
-        rsl.get shouldBe a[FilterBy.RejectingVariables]
+        rsl.get shouldBe a[FilterBy.RejectVars]
     }
 
     "Seq3" must "?" in {

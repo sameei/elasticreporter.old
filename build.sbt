@@ -1,6 +1,8 @@
 
 // ============================================================
 
+val appVersion = "0.3-SNAPSHOT"
+
 lazy val common = Seq(
     scalaVersion := "2.11.12",
     crossScalaVersions := Seq("2.11.12", "2.12.6"),
@@ -28,7 +30,7 @@ def flink(moduleName : String, flinkVersion : String, v: String) = {
         s"elasticreporter-flink${flinkVersion}",
         moduleName
     ).settings(
-        version := v,
+        sbt.Keys.version := v,
         crossScalaVersions := Seq("2.11.12"),
         libraryDependencies += "org.apache.flink" % "flink-metrics-core" % flinkVersion % Provided,
         libraryDependencies += "org.apache.flink" % "flink-core" % flinkVersion % Provided,
@@ -46,12 +48,12 @@ lazy val cmn = define(
     "common"
 ).settings(
     libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25" % Provided,
-    version := "0.2"
+    sbt.Keys.version := appVersion
 )
 
-lazy val flink14 = flink("flink14", "1.4.2", "0.2").dependsOn(cmn)
+lazy val flink14 = flink("flink14", "1.4.2", appVersion).dependsOn(cmn)
 
-lazy val flink12 = flink("flink12", "1.2.1", "0.2")
+lazy val flink12 = flink("flink12", "1.2.1", appVersion)
     .dependsOn(cmn)
     .settings(
         sourceDirectory := (sourceDirectory in flink14).value,
@@ -60,7 +62,7 @@ lazy val flink12 = flink("flink12", "1.2.1", "0.2")
 lazy val kamon = define("kamon", "elasticreporter-kamon", "kamon")
     .settings(
         libraryDependencies += "io.kamon" %% "kamon-core" % "1.1.0" % Provided,
-        version := "0.2"
+        sbt.Keys.version := appVersion
     ).dependsOn(cmn)
 
 lazy val examplejob = {

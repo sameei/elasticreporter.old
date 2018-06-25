@@ -102,7 +102,10 @@ trait Formatters {
 
     private def dump(subject: String, value: Any) = {
 
-        logger.warn(s"${subject}, ${value.getClass.getName}:")
+
+        if (value == null) logger.warn(s"Value is null, Subject: ${subject}")
+        else logger.warn(s"${subject}, ${value.getClass.getName}:")
+
         value match {
             case value: java.util.Map[_,_] =>
                 value.asScala.foreach { case (k,v) =>

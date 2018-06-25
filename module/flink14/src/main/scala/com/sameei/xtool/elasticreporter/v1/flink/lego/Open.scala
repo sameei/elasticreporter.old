@@ -8,19 +8,26 @@ import org.slf4j.LoggerFactory
 
 trait Open extends MetricReporter { self =>
 
-    protected def name: String = getClass.getName
+    private var _name = getClass.getName
+    protected def name: String = _name
 
     protected var config: elastic.Reporter.Config = null
 
     protected var reporter: elastic.Reporter = null
 
-    protected val logger = LoggerFactory getLogger s"${name}.reporter"
+    protected lazy val logger = LoggerFactory getLogger s"${name}.reporter"
 
     protected def contextfactory: elastic.Reporter.ContextFactory = new Reporter.ContextFactory.Default
 
     override def open(config : MetricConfig) : Unit = {
 
         import util._
+
+        Option(config.getString("name", null)).map{_.trim} match {
+            case None =>
+            case Some(i) if i.isEmpty =>
+            case Some(i) => _name = i
+        }
 
         self.config = elastic.Reporter.Config(
             host = config.getNonEmptyString("elastic-url"),
@@ -33,7 +40,7 @@ trait Open extends MetricReporter { self =>
 
         self.reporter = new elastic.Reporter(name, self.config, contextfactory)
 
-        logger info s"Open, Config: ${self.config}"
+        logger info s"Open, Class: ${self.getClass.getName}, Config: ${self.config}"
     }
 
     override def close() : Unit = {}

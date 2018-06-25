@@ -83,6 +83,11 @@ metrics.reporter.joboperator.filter-by.scope: <host>.taskmanager.<tm_id>.<job_na
 metrics.reporter.joboperator.group-by: <job_name>-<operator_id>-<subtask_index>
 metrics.reporter.joboperator.name-by.scope-drop-left: 6
 
+
+
+metrics.reporter.{}.name-by.selected-scope = developerdefined
+metrics.reporter.{}.filter-by.selected-scope = developerdefined
+
 ```
 
 ### For Kamon @ application.conf

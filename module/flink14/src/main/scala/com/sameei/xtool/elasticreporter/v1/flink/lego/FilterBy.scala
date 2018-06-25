@@ -2,10 +2,10 @@ package com.sameei.xtool.elasticreporter.v1.flink.lego
 
 import com.sameei.xtool.elasticreporter.v1.flink.lego.data.MetricRef
 import org.apache.flink.metrics.MetricConfig
-import org.slf4j.{Logger, LoggerFactory}
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
+
+import util.WithLogger
 
 trait FilterBy {
     def drop(ref: MetricRef): Boolean
@@ -18,14 +18,15 @@ object FilterBy {
         else filters.find { f => f.drop(ref) }
     }
 
-    class Nothing extends FilterBy {
+    case class Nothing(override val name: String) extends FilterBy with WithLogger {
 
-        override def drop(ref : MetricRef) : Boolean = false
-
-        override def toString : String = getClass.getName
+        override def drop(ref : MetricRef) : Boolean = {
+            if (logger.isTraceEnabled()) logger.trace(s"Drop: false, ${ref.desc}")
+            false
+        }
     }
 
-    case class Scope(pattern: String) extends FilterBy {
+    case class MatchScope(override val name: String, pattern: String) extends FilterBy with WithLogger {
 
         override def drop(ref : MetricRef) : Boolean = {
 
@@ -36,12 +37,19 @@ object FilterBy {
 
             val currentScope = ref.scope.mkString(".")
 
-            ! currentScope.startsWith(requiredScope)
+            val result = ! currentScope.startsWith(requiredScope)
+
+            if (logger.isTraceEnabled()) logger.trace(
+                s"Drop: ${result}, RequiredScope: ${requiredScope}, " +
+                    s"CurrentScope: ${currentScope}, ${ref.desc}"
+            )
+
+            result
         }
     }
 
 
-    case class RequiredVariables(pattern: String) extends FilterBy {
+    case class ForceVars(override val name: String, pattern: String) extends FilterBy with WithLogger {
 
         val requireds = {
             val temp = pattern.split('.').toSet
@@ -52,26 +60,33 @@ object FilterBy {
 
             val vars = ref.vars
 
-            if (vars.size < requireds.size) true
-            else {
+            if (vars.size < requireds.size) {
+                if (logger.isTraceEnabled()) logger.trace(
+                    s"Drop: true, DiffSize: ${requireds.size} vs. ${vars.size}, " +
+                        s"Forced: ${requireds}, ${ref.desc}"
+                )
+                true
+            } else {
 
                 val count = requireds.foldLeft(0) { (count, k) =>
-
-                    println(vars.contains(k), k, vars.get(k))
-
                     if (vars.contains(k)) count + 1
                     else count
                 }
 
-                count != requireds.size
+                val result = count != requireds.size
+
+                if (logger.isTraceEnabled()) logger.trace(
+                    s"Drop: ${result}, DiffSize: ${requireds.size} vs. ${vars.size}, " +
+                        s"Forced: ${requireds}, ${ref.desc}"
+                )
+
+                result
             }
 
         }
     }
 
-    case class RejectingVariables(pattern: String) extends FilterBy {
-
-        private val logger = LoggerFactory.getLogger(getClass)
+    case class RejectVars(override val name: String, pattern: String) extends FilterBy with WithLogger {
 
         val keys = {
             val temp = pattern.split('.').toSet
@@ -80,71 +95,48 @@ object FilterBy {
 
         override def drop(ref : MetricRef) : Boolean = {
             val vars = ref.vars
-            keys.find { i => vars.contains(i) }.isDefined
+            val result = keys.find { i => vars.contains(i) }
+
+            if (logger.isTraceEnabled()) logger.trace(
+                s"Drop: ${result.isDefined}, RejectedVars: ${result} form ${keys}, ${ref.desc}"
+            )
+
+            result.isDefined
         }
     }
 
-    class Status extends FilterBy {
+    case class SelectScope(override val name: String, scopeName: String) extends FilterBy with WithLogger {
 
-        val postfixes = Array(
-            "Status.JVM.ClassLoader.ClassesLoaded",
-            "Status.JVM.ClassLoader.ClassesUnloaded",
-            "Status.JVM.GarbageCollector.PS Scavenge.Count",
-            "Status.JVM.GarbageCollector.PS Scavenge.Time",
-            "Status.JVM.GarbageCollector.PS MarkSweep.Count",
-            "Status.JVM.GarbageCollector.PS MarkSweep.Time",
-            "Status.JVM.Memory.Heap.Used",
-            "Status.JVM.Memory.Heap.Committed",
-            "Status.JVM.Memory.Heap.Max",
-            "Status.JVM.Memory.NonHeap.Used",
-            "Status.JVM.Memory.NonHeap.Committed",
-            "Status.JVM.Memory.NonHeap.Max",
-            "Status.JVM.Memory.Direct.Count",
-            "Status.JVM.Memory.Direct.MemoryUsed",
-            "Status.JVM.Memory.Direct.TotalCapacity",
-            "Status.JVM.Memory.Mapped.Count",
-            "Status.JVM.Memory.Mapped.MemoryUsed",
-            "Status.JVM.Memory.Mapped.TotalCapacity",
-            "Status.JVM.Threads.Count",
-            "Status.JVM.CPU.Load",
-            "Status.JVM.CPU.Time",
-            "Status.Network.AvailableMemorySegments",
-            "Status.Network.TotalMemorySegments"
-        )
+        override def drop (ref : MetricRef) : Boolean = {
+            val remainedParts = ref.scope.dropWhile { i => i != scopeName }
+            val result = remainedParts.size < 1
 
-        val others = Array(
-            "totalNumberOfCheckpoints",
-            "numberOfInProgressCheckpoints",
-            "numberOfCompletedCheckpoints",
-            "numberOfFailedCheckpoints",
-            "lastCheckpointRestoreTimestamp",
-            "lastCheckpointSize",
-            "lastCheckpointDuration",
-            "lastCheckpointAlignmentBuffered",
-            "lastCheckpointExternalPath"
+            if (logger.isTraceEnabled()) logger.trace(
+                s"Drop: ${result}, ScopeName: ${scopeName}, RmainedParts: ${remainedParts.toList}, ${ref.desc}"
+            )
 
-        )
-
-        override def drop(ref : MetricRef) : Boolean = {
-            val id = ref.id
-            postfixes.find { i => id.endsWith(i) }.isEmpty
+            result
         }
     }
 
-    def apply(config: MetricConfig): Seq[FilterBy] = {
+    def apply(name: String, config: MetricConfig): Seq[FilterBy] = {
 
         var filters = ListBuffer.empty[FilterBy]
 
-        Option(config.getString("filter-by.required-vars", null)).foreach { vars =>
-            filters += new RequiredVariables(vars)
+        Option(config.getString("filter-by.force-vars", null)).foreach { vars =>
+            filters += new ForceVars(s"${name}.forcedvars",vars)
         }
 
         Option(config.getString("filter-by.reject-vars", null)).map { pattern =>
-            filters += new RejectingVariables(pattern)
+            filters += new RejectVars(s"${name}.rejectvars",pattern)
         }
 
-        Option(config.getString("filter-by.scope", null)).map { pattern =>
-            filters += new Scope(pattern)
+        Option(config.getString("filter-by.match-scope", null)).map { pattern =>
+            filters += new MatchScope(s"${name}.matchscope", pattern)
+        }
+
+        Option(config.getString("filter-by.select-scope", null)).map { scopeName =>
+            filters += new SelectScope(s"${name}.selectscope", scopeName)
         }
 
         filters.toList
