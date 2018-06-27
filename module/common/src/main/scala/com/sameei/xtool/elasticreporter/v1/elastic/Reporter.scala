@@ -2,6 +2,7 @@ package com.sameei.xtool.elasticreporter.v1.elastic
 
 import java.time.{LocalDateTime, ZoneId}
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 import com.sameei.xtool.elasticreporter.v1.common.{FormatterV1, data}
 import com.sameei.xtool.elasticreporter.v1.{common, elastic}
@@ -104,6 +105,7 @@ object Reporter {
 
         override def vals : Seq[formatter.Val] = Seq(
             formatter.formatLong(keyFor("time.millis"), time),
+            formatter.formatString(keyFor("uuid"), UUID.randomUUID().toString),
             formatter.formatString(keyFor("time.formatted"), localDateTimeAsString),
             formatter.formatString(keyFor("source.id"), source)
         )

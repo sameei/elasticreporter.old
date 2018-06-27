@@ -89,15 +89,22 @@ trait ReporterForMultipleGroups extends Open with Scheduled {
 
         val endedAt = System.currentTimeMillis
 
-        if (logger.isDebugEnabled()) logger.debug(s"Report, Time: ${startedAt}, Taked Millis: ${endedAt - startedAt}, Groups: ${groups.size}")
+        if (logger.isDebugEnabled()) logger.debug(
+            s"Report, Time: ${startedAt}, Taked Millis: ${endedAt - startedAt}, Groups: ${groups.size}"
+        )
 
         logger.debug(s"Report, Remove Queue: ${removeQueue.size}")
+
         if (!removeQueue.isEmpty) synchronized {
+
             val size = removeQueue.size
+
             removeQueue.foreach { data =>
                 dropMetric(data.ref.groupId, data.name, data.value, data.group)
             }
+
             removeQueue.clear()
+
             if (logger.isDebugEnabled()) logger.debug(s"Report, Drop Metric, Clear Queue: ${size}")
 
             if (logger.isDebugEnabled()) groups.foreach { case (k,v) =>
