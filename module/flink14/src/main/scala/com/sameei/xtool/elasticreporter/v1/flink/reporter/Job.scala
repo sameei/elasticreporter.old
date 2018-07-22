@@ -1,7 +1,7 @@
-package com.sameei.xtool.elasticreporter.v1.flink.reporter
+package xyz.sigmalab.xtool.elasticreporter.v1.flink.reporter
 
-import com.sameei.xtool.elasticreporter.v1.flink.lego.ReporterForJob
-import com.sameei.xtool.elasticreporter.v1.flink.lego.data.FlinkMetricRef
+import xyz.sigmalab.xtool.elasticreporter.v1.flink.lego.ReporterForJob
+import xyz.sigmalab.xtool.elasticreporter.v1.flink.lego.data.FlinkMetricRef
 import org.apache.flink.metrics.{Metric, MetricGroup}
 
 import scala.collection.JavaConverters._

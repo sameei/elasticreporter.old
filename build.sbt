@@ -6,7 +6,7 @@ val appVersion = "0.3-SNAPSHOT"
 lazy val common = Seq(
     scalaVersion := "2.11.12",
     crossScalaVersions := Seq("2.11.12", "2.12.6"),
-    organization := "com.sameei.xtool",
+    organization := "xyz.sigmalab.xtool",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % Test,
     libraryDependencies ++= Seq(
         "circe-core", "circe-generic", "circe-parser"

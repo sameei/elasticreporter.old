@@ -1,11 +1,11 @@
-package com.sameei.xtool.elasticreporter.v1.flink.reporter
+package xyz.sigmalab.xtool.elasticreporter.v1.flink.reporter
 
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-import com.sameei.xtool.elasticreporter.v1.common
-import com.sameei.xtool.elasticreporter.v1.elastic.Reporter
-import com.sameei.xtool.elasticreporter.v1.flink.{lego, reporter}
+import xyz.sigmalab.xtool.elasticreporter.v1.common
+import xyz.sigmalab.xtool.elasticreporter.v1.elastic.Reporter
+import xyz.sigmalab.xtool.elasticreporter.v1.flink.{lego, reporter}
 import org.apache.flink.metrics._
 
 class JVMStat extends lego.ReporterForSingleGroup {
