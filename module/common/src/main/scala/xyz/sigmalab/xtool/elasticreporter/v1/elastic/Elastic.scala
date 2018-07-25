@@ -12,64 +12,91 @@ import scala.util.control.NonFatal
 
 case class Elastic(name: String, host: String) {
 
+
+
     private val logger = LoggerFactory.getLogger(name)
 
     logger.debug(s"Init ..., Class: ${getClass.getName}")
 
-    Try {
-        require(host != null, "'host' can't be null!")
-        require(!host.isEmpty, "'host' can't be empty")
-        new URL(host).openConnection().asInstanceOf[HttpURLConnection]
-    }.map { http =>
+
+    httpRequest(host) { http =>
         http.connect()
         val body = readStream(http.getInputStream)
-        (http, body)
+        body
     } match {
-        case Success((http, body)) =>
+        case Success(body) =>
             logger.info(s"Init, Host: ${host}, Elastic: ${body}")
         case Failure(cause) =>
             logger.warn(s"Init, Host: ${host}, Failure: ${cause.getMessage}", cause)
             throw Elastic.InitException("Init Failure", host, Option(cause))
     }
 
-    def put(report: Reporter.Report): Try[Unit] = Try {
+    def put(report: Reporter.Report): Try[Unit] = {
 
         val url = s"${host}/${report.index}/doc/${report.doc}"
 
         if (logger.isTraceEnabled()) logger.trace(s"PUT, URL: ${url}, Req(${report.body.getBytes.size}): ${report.body}")
 
-        val http = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
+        httpRequest(url) { http =>
+            http setUseCaches false
+            http setDoOutput true
+            http setRequestMethod "PUT"
+            http setRequestProperty("Content-Type", "application/json")
 
-        http setUseCaches false
-        http setDoOutput true
-        http setRequestMethod "PUT"
-        http setRequestProperty("Content-Type", "application/json")
+            val output = new DataOutputStream(http.getOutputStream);
+            val bytes = report.body.getBytes()
 
-        val output = new DataOutputStream(http.getOutputStream);
-        val bytes = report.body.getBytes()
+            output.write(bytes)
 
-        output.write(bytes)
+            output.flush()
+            output.close()
 
-        output.flush()
-        output.close()
+            http.connect()
 
-        http.connect()
-
-        http.getResponseCode match {
-            case 200 | 201 =>
-                if (logger.isDebugEnabled()) {
-                    val body = readStream(http.getInputStream)
-                    logger.debug(s"PUT, URL: ${url}, Req(${bytes.length}), Res(${body.getBytes.length})")
-                    logger.trace(s"PUT, URL: ${url}, Res(${body.getBytes.length}): ${body}")
-                }
-            case unexp =>
-                if (logger.isWarnEnabled()) {
-                    val body = readStream(http.getErrorStream)
-                    logger.warn(s"PUT, URL: ${url}, Req(${bytes.length}): ${report.body}, Res(${body.getBytes.length}): ${body}")
-                }
-                throw Elastic.PutException(s"Put Failure, Unexpected ResponseCode: ${unexp}", report)
+            http.getResponseCode match {
+                case 200 | 201 =>
+                    if (logger.isDebugEnabled()) {
+                        val body = readStream(http.getInputStream)
+                        logger.debug(s"PUT, URL: ${url}, Req(${bytes.length}), Res(${body.getBytes.length})")
+                        logger.trace(s"PUT, URL: ${url}, Res(${body.getBytes.length}): ${body}")
+                    }
+                case unexp =>
+                    if (logger.isWarnEnabled()) {
+                        val body = readStream(http.getErrorStream)
+                        logger.warn(s"PUT, URL: ${url}, Req(${bytes.length}): ${report.body}, Res(${body.getBytes.length}): ${body}")
+                    }
+                    throw Elastic.PutException(s"Put Failure, Unexpected ResponseCode: ${unexp}", report)
+            }
         }
+    }
 
+    protected def httpRequest[T](url: String)(fn: HttpURLConnection => T): Try[T] = {
+        var http: HttpURLConnection = null
+        try {
+
+            val rsl = Try {
+                http = new URL(host).openConnection().asInstanceOf[HttpURLConnection]
+                // https://stackoverflow.com/questions/16688524/httpurlconnection-does-not-free-resources
+                // System.setProperty("http.keepAlive", "false")       // ???
+                // System.setProperty("http.maxConnections", "5")      // ???
+                fn(http)
+            }
+
+            Try { http.getInputStream.close };
+            Try { http.getErrorStream.close };
+            Try { http.disconnect() };
+
+            rsl
+
+        } catch {
+            case NonFatal(cause) =>
+
+                Try { http.getInputStream.close };
+                Try { http.getErrorStream.close };
+                Try { http.disconnect() };
+
+                Failure(cause)
+        }
     }
 
     protected def readStream(input: InputStream): String = {
