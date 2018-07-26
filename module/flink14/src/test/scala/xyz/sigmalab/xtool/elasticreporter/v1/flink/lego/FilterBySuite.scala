@@ -2,7 +2,7 @@ package xyz.sigmalab.xtool.elasticreporter.v1.flink.lego
 
 import java.util
 
-import com.sameei.xtool.elasticreporter.v1.flink.lego.data.FakeMetricRef
+import xyz.sigmalab.xtool.elasticreporter.v1.flink.lego.data.FakeMetricRef
 import org.apache.flink.metrics._
 import org.scalatest._
 

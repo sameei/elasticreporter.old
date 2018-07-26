@@ -75,7 +75,7 @@ case class Elastic(name: String, host: String) {
         try {
 
             val rsl = Try {
-                http = new URL(host).openConnection().asInstanceOf[HttpURLConnection]
+                http = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
                 // https://stackoverflow.com/questions/16688524/httpurlconnection-does-not-free-resources
                 // System.setProperty("http.keepAlive", "false")       // ???
                 // System.setProperty("http.maxConnections", "5")      // ???

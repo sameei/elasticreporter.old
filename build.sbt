@@ -1,7 +1,7 @@
 
 // ============================================================
 
-val appVersion = "0.4.1-SNAPSHOT"
+val appVersion = "0.4.1-RC1"
 
 lazy val common = Seq(
     scalaVersion := "2.11.12",
