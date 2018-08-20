@@ -1,14 +1,14 @@
 package xyz.sigmalab.xtool.elasticreporter.v1.elastic
 
-import java.time.{LocalDateTime, ZoneId}
+import java.time.{ LocalDateTime, ZoneId }
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-import xyz.sigmalab.xtool.elasticreporter.v1.common.{FormatterV1, data}
-import xyz.sigmalab.xtool.elasticreporter.v1.{common, elastic}
+import xyz.sigmalab.xtool.elasticreporter.v1.common.{ FormatterV1, ReportContext, data }
+import xyz.sigmalab.xtool.elasticreporter.v1.{ common, elastic }
 import org.slf4j.LoggerFactory
 
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 
 class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextFactory){
@@ -25,12 +25,12 @@ class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextF
 
     private val dtf = DateTimeFormatter.ofPattern(config.datetimePattern).withZone(zoneId)
 
-    def apply(gm : common.GroupedMetrics, time: Long): Unit = {
+    def generate(gm : common.GroupedMetrics, time: Long): Reporter.Report = {
 
         implicit val context = factory.apply(name, time, config)
 
         if (logger.isTraceEnabled())
-            logger.trace(s"Apply ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}")
+            logger.trace(s"Generate ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}")
 
         val vars = {
             context.vars ++ gm.vars(context)
@@ -46,24 +46,33 @@ class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextF
         }
 
         if (logger.isTraceEnabled())
-            logger.trace(s"Apply ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}, Values(${values.size}): ${values}, Vars(${vars.size}): ${vars}")
+            logger.trace(s"Generate ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}, Values(${values.size}): ${values}, Vars(${vars.size}): ${vars}")
 
         val report = Reporter.Report(
             index.index(vars),
             index.id(vars),
-            context.formatter.format(values)
+            context.formatter.format(values),
+            context.meta
         )
 
+        report
+    }
+
+    def publish(gm: common.GroupedMetrics, report: Reporter.Report) = {
         es.put(report) match {
 
             case Success(_) =>
                 if (logger.isInfoEnabled())
-                    logger.info(s"Apply, Done, GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}, Index: ${report.index}, Doc: ${report.doc}")
+                    logger.info(s"Apply, Done, GroupedMetrics: ${gm.id}, Context: ${report.context.id}, DateTime: ${report.context.localDateTime}, Index: ${report.index}, Doc: ${report.doc}")
 
             case Failure(cause) =>
                 if (logger.isWarnEnabled())
-                    logger.warn(s"Apply, Failed, GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}, Index: ${report.index}, Doc: ${report.doc}, Failure: ${cause.getMessage}", cause)
+                    logger.warn(s"Apply, Failed, GroupedMetrics: ${gm.id}, Context: ${report.context.id}, DateTime: ${report.context.localDateTime}, Index: ${report.index}, Doc: ${report.doc}, Failure: ${cause.getMessage}", cause)
         }
+    }
+
+    def apply(gm : common.GroupedMetrics, time: Long): Unit = {
+        publish(gm, generate(gm, time))
     }
 
     def applyAll(gms: Seq[common.GroupedMetrics], time: Long) : Unit = {
@@ -142,5 +151,10 @@ object Reporter {
         val SourceId = "<source_id>"
     }
 
-    case class Report(index: String, doc: String, body: String)
+    case class Report(
+        index: String,
+        doc: String,
+        body: String,
+        context: ReportContext.Meta
+    )
 }

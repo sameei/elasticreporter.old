@@ -36,4 +36,16 @@ trait ReportContext {
 
     def localDateTimeAsString: String = localdatetime.format(datetimeFormatter)
 
+    def meta : ReportContext.Meta = ReportContext.Meta(id, time, zone, localDateTimeAsString)
+
+}
+
+object ReportContext {
+
+    case class Meta(
+        id: String,
+        time: data.Millis,
+        zone: String,
+        localDateTime: String
+    )
 }
