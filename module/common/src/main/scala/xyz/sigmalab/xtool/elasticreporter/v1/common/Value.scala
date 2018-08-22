@@ -11,5 +11,5 @@ object Value {
     sealed trait Type
     case object Simple extends Type
     case object Qouted extends Type
-
+    
 }

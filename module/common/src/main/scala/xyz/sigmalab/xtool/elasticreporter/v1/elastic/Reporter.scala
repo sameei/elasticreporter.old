@@ -19,44 +19,7 @@ class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextF
 
     private val es = Elastic(s"${name}.elastic",config.host)
 
-    private val index = new IndexAndId(config.indexPattern, config.idPattern)
-
-    private val zoneId = ZoneId.of(config.zone)
-
-    private val dtf = DateTimeFormatter.ofPattern(config.datetimePattern).withZone(zoneId)
-
-    def generate(gm : common.GroupedMetrics, time: Long): Reporter.Report = {
-
-        implicit val context = factory.apply(name, time, config)
-
-        if (logger.isTraceEnabled())
-            logger.trace(s"Generate ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}")
-
-        val vars = {
-            context.vars ++ gm.vars(context)
-        }
-
-        val values = {
-
-            context.vals ++
-                gm.metrics(context) ++
-                vars.map { case (k,v) =>
-                    context.formatter.formatString(context.keyFor(s"var.${k}"), v)
-                }
-        }
-
-        if (logger.isTraceEnabled())
-            logger.trace(s"Generate ..., GroupedMetrics: ${gm.id}, Context: ${context.id}, DateTime: ${context.localDateTimeAsString}, Values(${values.size}): ${values}, Vars(${vars.size}): ${vars}")
-
-        val report = Reporter.Report(
-            index.index(vars),
-            index.id(vars),
-            context.formatter.format(values),
-            context.meta
-        )
-
-        report
-    }
+    private val generator = new Generator(s"${name}.generator", config, factory)
 
     def publish(gm: common.GroupedMetrics, report: Reporter.Report) = {
         es.put(report) match {
@@ -72,7 +35,7 @@ class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextF
     }
 
     def apply(gm : common.GroupedMetrics, time: Long): Unit = {
-        publish(gm, generate(gm, time))
+        publish(gm, generator(gm, time))
     }
 
     def applyAll(gms: Seq[common.GroupedMetrics], time: Long) : Unit = {
@@ -101,6 +64,8 @@ object Reporter {
         val keyPrefix: String = "@meta"
     ) extends common.ReportContext { self =>
 
+        val uuid = UUID.randomUUID().toString
+
         override type Formatter = FormatterV1
 
         override val formatter = new FormatterV1
@@ -114,7 +79,7 @@ object Reporter {
 
         override def vals : Seq[formatter.Val] = Seq(
             formatter.formatLong(keyFor("time.millis"), time),
-            formatter.formatString(keyFor("uuid"), UUID.randomUUID().toString),
+            formatter.formatString(keyFor("uuid"), uuid),
             formatter.formatString(keyFor("time.formatted"), localDateTimeAsString),
             formatter.formatString(keyFor("source.id"), source)
         )
@@ -124,7 +89,8 @@ object Reporter {
             CustomVar.Month -> localdatetime.getMonthValue.toString,
             CustomVar.DayOfMonth -> localdatetime.getDayOfMonth.toString,
             CustomVar.Millis -> time.toString,
-            CustomVar.SourceId -> source
+            CustomVar.SourceId -> source,
+            CustomVar.UUID -> uuid
         )
     }
 
@@ -149,6 +115,7 @@ object Reporter {
         val DayOfMonth = "<day_of_month>"
         val Millis = "<millis>"
         val SourceId = "<source_id>"
+        val UUID = "<uuid>"
     }
 
     case class Report(
@@ -156,5 +123,5 @@ object Reporter {
         doc: String,
         body: String,
         context: ReportContext.Meta
-    )
+    ) extends common.Report
 }

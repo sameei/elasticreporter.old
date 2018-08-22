@@ -25,17 +25,22 @@ class IndexAndIdSuite extends FlatSpec with Matchers  {
 
     it must "replace vars properly #2" in {
 
-        val index = new elastic.IndexAndId("mine-<year>-<month>-<year>", "doc-<millis>")
+        val uuid = java.util.UUID.randomUUID().toString
+
+        val index = new elastic.IndexAndId("mine-<year>-<month>-<year>", "doc-<millis>-<uuid>")
 
         val vars = Map(
             "<year>" -> 2018.toString,
             "<month>" -> 5.toString,
-            "<millis>" -> 121212.toString
+            "<millis>" -> 121212.toString,
+            "<uuid>" -> uuid
         )
 
         info(index.index(vars))
         index.index(vars) shouldEqual "mine-2018-5-2018"
 
+        info(index.id(vars))
+        index.id(vars) shouldEqual s"doc-121212-${uuid}"
     }
 
     it must "replace vars properly #3" in {
