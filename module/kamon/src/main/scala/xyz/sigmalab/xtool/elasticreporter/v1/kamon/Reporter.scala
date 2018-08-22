@@ -59,3 +59,4 @@ class Reporter(
         logger.info("Reconfigure !")
     }
 }
+
