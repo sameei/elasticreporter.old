@@ -40,6 +40,14 @@ def flink(moduleName : String, flinkVersion : String, v: String) = {
     )
 }
 
+def flinkClone(moduleName: String, flinkVersion: String, v: String, origin: Project) = {
+    flink(
+        moduleName, flinkVersion, v
+    ).dependsOn(cmn).settings( 
+        sourceDirectory := (sourceDirectory in origin).value
+    )
+}
+
 // ============================================================
 
 lazy val cmn = define(
@@ -51,13 +59,13 @@ lazy val cmn = define(
     sbt.Keys.version := appVersion
 )
 
-lazy val flink14 = flink("flink14", "1.4.2", appVersion).dependsOn(cmn)
+lazy val flink16 = flink("flink16", "1.6.0", appVersion).dependsOn(cmn)
 
-lazy val flink12 = flink("flink12", "1.2.1", appVersion)
-    .dependsOn(cmn)
-    .settings(
-        sourceDirectory := (sourceDirectory in flink14).value,
-    )
+lazy val flink15 = flinkClone("flink15", "1.5.3", appVersion, flink16)
+
+lazy val flink14 = flinkClone("flink14", "1.4.2", appVersion, flink15)
+
+lazy val flink12 = flinkClone("flink12", "1.2.1", appVersion, flink14)
 
 lazy val kamon = define("kamon", "elasticreporter-kamon", "kamon")
     .settings(
@@ -71,7 +79,7 @@ lazy val examplejob = {
         "flink-scala",
         "flink-streaming-scala"
     ) map { m =>
-        "org.apache.flink" %% m % "1.4.2" % Provided
+        "org.apache.flink" %% m % "1.6.0" % Provided
     }
 
     val flinkJob = taskKey[File]("Source of jar")
@@ -112,4 +120,8 @@ lazy val examplejob = {
         )
 }
 
-lazy val root = (project in file(".")).aggregate(cmn, flink14, flink12, examplejob)
+lazy val root = (project in file(".")).aggregate(
+    cmn, kamon,
+    flink16, flink15, flink14, flink12, 
+    examplejob
+)

@@ -18,7 +18,7 @@ class FilterBySuite extends FlatSpec with Matchers {
     Vars: Map(<host> -> localhost, <tm_id> -> ca75e2f0b9f4bfee9b08f2fc6f4fe3b7)
     */
 
-    "MatchScope" must "accept" in {
+    "MatchScope" must "match 'localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7....' to '<host>.taskmanager'" in {
 
         FilterBy.MatchScope("?","<host>.taskmanager").drop(FakeMetricRef(
             "AvailableMemorySegments",
@@ -26,6 +26,9 @@ class FilterBySuite extends FlatSpec with Matchers {
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
             List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
         )) shouldEqual false
+    }
+
+    "MatchScope" must "match 'localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7....' to '<host>.taskmanger.<tm>'" in {
 
         FilterBy.MatchScope("?","<host>.taskmanager.<tm_id>").drop(FakeMetricRef(
             "AvailableMemorySegments",
@@ -33,11 +36,9 @@ class FilterBySuite extends FlatSpec with Matchers {
             Map("<host>" -> "localhost", "<tm_id>" -> "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7"),
             List("localhost", "taskmanager", "ca75e2f0b9f4bfee9b08f2fc6f4fe3b7", "Status", "Network")
         )) shouldEqual false
-
     }
 
-    "Scope" must "drop" in {
-
+    "MatchScope" must "drop 'localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status....' for '<host>.taskmanager.<tm_id>.something'" in {
         FilterBy.MatchScope("?","<host>.taskmanager.<tm_id>.something").drop(FakeMetricRef(
             "AvailableMemorySegments",
             "localhost.taskmanager.ca75e2f0b9f4bfee9b08f2fc6f4fe3b7.Status.Network.AvailableMemorySegments",
