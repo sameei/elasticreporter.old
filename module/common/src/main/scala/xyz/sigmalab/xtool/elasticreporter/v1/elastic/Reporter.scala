@@ -4,7 +4,7 @@ import java.time.{ LocalDateTime, ZoneId }
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-import xyz.sigmalab.xtool.elasticreporter.v1.common.{ FormatterV1, ReportContext, data }
+import xyz.sigmalab.xtool.elasticreporter.v1.common._
 import xyz.sigmalab.xtool.elasticreporter.v1.{ common, elastic }
 import org.slf4j.LoggerFactory
 
@@ -21,6 +21,10 @@ class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextF
 
     private val generator = new Generator(s"${name}.generator", config, factory)
 
+    def generate(gm: GroupedMetrics, time: Long): Reporter.Report = {
+        generator(gm, time)
+    }
+
     def publish(gm: common.GroupedMetrics, report: Reporter.Report) = {
         es.put(report) match {
 
@@ -35,7 +39,7 @@ class Reporter(name: String, config: Reporter.Config, factory: Reporter.ContextF
     }
 
     def apply(gm : common.GroupedMetrics, time: Long): Unit = {
-        publish(gm, generator(gm, time))
+        publish(gm, generate(gm, time))
     }
 
     def applyAll(gms: Seq[common.GroupedMetrics], time: Long) : Unit = {
